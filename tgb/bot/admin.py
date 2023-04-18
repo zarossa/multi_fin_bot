@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import User, Currency
+from .models import User, Currency, CategoryIncome
 
 
 @admin.register(User)
@@ -11,3 +11,8 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(Currency)
 class CurrencyAdmin(admin.ModelAdmin):
     list_display = ['id', 'code', 'name']
+
+
+@admin.register(CategoryIncome)
+class CategoryIncomeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'name']

@@ -1,6 +1,7 @@
 # Folders
 .idea
 __pycache__
+venv
 
 #Environments
 .env

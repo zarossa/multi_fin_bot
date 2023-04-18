@@ -22,17 +22,29 @@ class Income(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE)
+    category = models.ForeignKey('CategoryIncome', on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.user.name} - {self.amount} {self.currency.code} (Income)"
 
 
+class CategoryIncome(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+
+
 class Expense(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE)
+    category = models.ForeignKey('CategoryExpense', on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.user.name} - {self.amount} {self.currency.code} (Expense)"
+
+
+class CategoryExpense(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
