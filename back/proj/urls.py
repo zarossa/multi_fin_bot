@@ -16,10 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from bot import views
+from bot.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('random/', views.RandomWord.as_view()),
-    path('next/<int:pk>', views.NextWord.as_view()),
+    path('random/', RandomWord.as_view()),
+    path('next/<int:pk>', NextWord.as_view()),
+    path('income/create/', CreateIncome.as_view(), name='income-create'),
+    path('api/v1/incomes/', IncomeAPIView.as_view()),
+
 ]
