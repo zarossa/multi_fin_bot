@@ -1,5 +1,6 @@
 import random
 
+from django.forms import model_to_dict
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.generics import ListAPIView
@@ -29,7 +30,18 @@ class CreateIncome(APIView):
 
 class IncomeAPIView(APIView):
     def get(self, request):
-        return Response({'title': 'name'})
+        incomes = Income.objects.all().values()
+        return Response({'incomes': list(incomes)})
+
+    def post(self, request):
+        income_new = Income.objects.create(
+            user_id=request.data['user'],  # 1
+            amount=request.data['amount'],  # 100
+            currency_id=request.data['currency'],  # 1,
+            category_id=request.data['category'],  # 1,
+        )
+        return Response({'income': model_to_dict(income_new)})
+
 
 class RandomWord(APIView):
     @staticmethod
