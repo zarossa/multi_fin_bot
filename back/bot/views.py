@@ -36,13 +36,33 @@ class IncomeAPIView(APIView):
     def post(self, request):
         serializer = IncomeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        income_new = Income.objects.create(
-            user_id=request.data['user_id'],  # 1
-            amount=request.data['amount'],  # 100
-            currency_id=request.data['currency_id'],  # 1,
-            category_id=request.data['category_id'],  # 1,
-        )
-        return Response({'income': IncomeSerializer(income_new).data})
+        serializer.save()
+        return Response({'post': serializer.data})
+
+    def put(self, request, *args, **kwargs):
+        pk = kwargs.get('pk')
+        if pk is None:
+            return Response({'error': 'Method PUT not allowed'})
+        try:
+            instance = Income.objects.get(pk=pk)
+        except:
+            return Response({'error': 'Object does not exists'})
+
+        serializer = IncomeSerializer(data=request.data, instance=instance)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'post': serializer.data})
+
+    def delete(self, request, *args, **kwargs):
+        pk = kwargs.get('pk')
+        if pk is None:
+            return Response({'error': 'Method DELETE not allowed'})
+        try:
+            Income.objects.get(pk=pk).delete()
+        except:
+            return Response({'error': 'Object does not exists'})
+
+        return Response({'post': f'delete post {pk}'})
 
 
 class RandomWord(APIView):

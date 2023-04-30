@@ -46,7 +46,16 @@ class IncomeSerializer(serializers.Serializer):
     category_id = serializers.IntegerField()
     created_at = serializers.DateTimeField(read_only=True)
 
+    def create(self, validated_data):
+        return Income.objects.create(**validated_data)
 
+    def update(self, instance, validated_data):
+        instance.user_id = validated_data.get('user_id', instance.user_id)
+        instance.amount = validated_data.get('amount', instance.amount)
+        instance.currency_id = validated_data.get('currency_id', instance.currency_id)
+        instance.category_id = validated_data.get('category_id', instance.category_id)
+        instance.save()
+        return instance
 
 # def encode():
 #     model = IncomeModel(250)

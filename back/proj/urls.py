@@ -24,5 +24,6 @@ urlpatterns = [
     path('next/<int:pk>', NextWord.as_view()),
     path('income/create/', CreateIncome.as_view(), name='income-create'),
     path('api/v1/incomes/', IncomeAPIView.as_view()),
+    path('api/v1/incomes/<int:pk>/', IncomeAPIView.as_view()),
 
 ]
