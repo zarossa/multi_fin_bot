@@ -30,17 +30,19 @@ class CreateIncome(APIView):
 
 class IncomeAPIView(APIView):
     def get(self, request):
-        incomes = Income.objects.all().values()
-        return Response({'incomes': list(incomes)})
+        incomes = Income.objects.all()
+        return Response({'incomes': IncomeSerializer(incomes, many=True).data})
 
     def post(self, request):
+        serializer = IncomeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
         income_new = Income.objects.create(
-            user_id=request.data['user'],  # 1
+            user_id=request.data['user_id'],  # 1
             amount=request.data['amount'],  # 100
-            currency_id=request.data['currency'],  # 1,
-            category_id=request.data['category'],  # 1,
+            currency_id=request.data['currency_id'],  # 1,
+            category_id=request.data['category_id'],  # 1,
         )
-        return Response({'income': model_to_dict(income_new)})
+        return Response({'income': IncomeSerializer(income_new).data})
 
 
 class RandomWord(APIView):
