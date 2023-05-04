@@ -10,29 +10,28 @@ from . import messages
 from .app import dp
 from .states import WorkStates
 
-USER_API_URL = os.getenv('USER_API_URL')
 USER_API_REGISTER = os.getenv('USER_API_REGISTER')
-
+USER_API_LOGIN = os.getenv('USER_API_LOGIN')
 PASSWORD = os.getenv('PASSWORD')
 
 
-async def get_user(telegram_id: int):
+async def login_user(username: int, password: str = PASSWORD):
     async with aiohttp.ClientSession() as session:
-        async with session.get(f'{USER_API_URL}{str(telegram_id)}/') as response:
-            status = response.status
-            if status == 200:
-                return await response.json()
-            return None
+        async with session.post(USER_API_LOGIN, json={
+            'username': username,
+            'password': password
+        }) as response:
+            data = await response.json()
+            return data.get('auth_token')
 
 
-async def create_user(telegram_user: User):
+async def register_user(telegram_user: User, password: str = PASSWORD):
     async with aiohttp.ClientSession() as session:
         async with session.post(USER_API_REGISTER, json={
             'username': telegram_user.id,
             'first_name': telegram_user.first_name,
-            'password': PASSWORD
+            'password': password
         }) as response:
-            print(response, response.status)
             if response.status == 201:
                 data = await response.json()
                 # Process the response data if needed
@@ -46,18 +45,10 @@ async def create_user(telegram_user: User):
 async def send_welcome(message: types.Message, state: FSMContext):
     await WorkStates.start.set()
 
-    user = await get_user(message.from_user.id)
-    if not user:
-        answer = await create_user(message.from_user)
+    token = await login_user(username=message.from_user.id)
+
+    if not token:
+        answer = await register_user(message.from_user)
         await message.reply(answer)
-        return
-    async with state.proxy() as data:
-        print(data)
-        # user, created = await sync_to_async(TelegramUser.objects.get_or_create)(
-        #     telegram_id=message.from_user.id,
-        #     defaults={
-        #         'name': message.from_user.first_name,
-        #         'preferred_currency': preferred_currency
-        #     }
-        # )
-        await message.reply(messages.WELCOME_MESSAGE)
+        token = await login_user(username=message.from_user.id)
+    await message.reply(f'{messages.WELCOME_MESSAGE}\nYour token is:\n{token}')
