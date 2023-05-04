@@ -2,16 +2,16 @@ from django.contrib.auth.models import User
 from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 
-from .models import Currency
+from .models import Currency, Account
 
 
-# class UserSerializer(serializers.ModelSerializer):
-#
-#     class Meta:
-#         model = User
-#         fields = ('pk', 'username', 'first_name', 'password')
-#
-#
+class AccountSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Account
+        fields = ('pk', 'currency')
+
+
 class CustomUserCreateSerializer(UserCreateSerializer):
     first_name = serializers.CharField()
 

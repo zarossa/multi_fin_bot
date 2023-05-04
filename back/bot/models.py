@@ -2,6 +2,13 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
+def get_or_none(classmodel, **kwargs):
+    try:
+        return classmodel.objects.get(**kwargs)
+    except classmodel.DoesNotExist:
+        return None
+
+
 class BaseModel(models.Model):
     objects = models.Manager()
 
@@ -11,7 +18,7 @@ class BaseModel(models.Model):
 
 class Account(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    currency = models.ForeignKey('Currency', verbose_name='Base currency', on_delete=models.PROTECT)
+    currency = models.ForeignKey('Currency', verbose_name='Base currency', on_delete=models.PROTECT, null=True, blank=True)
 
     def __str__(self):
         return self.user.first_name
