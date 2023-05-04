@@ -17,12 +17,12 @@ class BaseModel(models.Model):
 #         return self.name
 
 
-# class Currency(BaseModel):
-#     code = models.CharField(max_length=5, unique=True)
-#     name = models.CharField(max_length=50)
-#
-#     def __str__(self):
-#         return self.code
+class Currency(BaseModel):
+    code = models.CharField(max_length=5, unique=True)
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.code
 #
 #
 # class Income(BaseModel):
