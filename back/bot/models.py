@@ -9,12 +9,12 @@ class BaseModel(models.Model):
         abstract = True
 
 
-# class TelegramUser(BaseModel):
-#     user = models.OneToOneField(User, on_delete=models.CASCADE)
-#     telegram_id = models.PositiveIntegerField(unique=True)
-#
-#     def __str__(self):
-#         return self.name
+class Account(BaseModel):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    currency = models.ForeignKey('Currency', verbose_name='Base currency', on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.user.first_name
 
 
 class Currency(BaseModel):

@@ -51,4 +51,6 @@ async def send_welcome(message: types.Message, state: FSMContext):
         answer = await register_user(message.from_user)
         await message.reply(answer)
         token = await login_user(username=message.from_user.id)
-    await message.reply(f'{messages.WELCOME_MESSAGE}\nYour token is:\n{token}')
+    async with state.proxy() as data:
+        data['token'] = token
+    await message.reply(messages.WELCOME_MESSAGE)
