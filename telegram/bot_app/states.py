@@ -5,3 +5,7 @@ class GameStates(StatesGroup):
     start = State()
     random_ten = State()
     all_words = State()
+
+
+class WorkStates(StatesGroup):
+    start = State()

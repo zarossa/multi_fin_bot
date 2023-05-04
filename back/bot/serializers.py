@@ -1,43 +1,57 @@
-import io
-
+from django.contrib.auth.models import User
+from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
-from rest_framework.parsers import JSONParser
-from rest_framework.renderers import JSONRenderer
 
-from .models import User, Currency, Income, CategoryIncome, Word
-
-
-class WordSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Word
-        fields = ['pk', 'gender', 'word']
+# from .models import Currency, Income, CategoryIncome,
 
 
 class UserSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
-        fields = ('pk', 'telegram_id', 'name', 'preferred_currency')
+        fields = ('pk', 'username', 'first_name', 'password')
 
 
-class CurrencySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Currency
-        fields = ('pk', 'code', 'name')
+class CustomUserCreateSerializer(UserCreateSerializer):
+    first_name = serializers.CharField()
 
-
-class CategoryIncomeSerializer(serializers.ModelSerializer):
-    # user = UserSerializer()
-
-    class Meta:
-        model = CategoryIncome
-        fields = ('pk', 'user', 'name')
-
-
-class IncomeSerializer(serializers.ModelSerializer):
-    # user = UserSerializer()
-    # currency = CurrencySerializer()
-    # category = CategoryIncomeSerializer()
-
-    class Meta:
-        model = Income
-        fields = ('user', 'amount', 'currency', 'category')
+    class Meta(UserCreateSerializer.Meta):
+        fields = ('username', 'password', 'first_name')
+#
+#
+# class CategoryPermission:
+#     def __call__(self) -> list:
+#         categories = CategoryIncome.objects.filter(user=CurrentUser())
+#         return categories
+#
+#
+# class UserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ('pk', 'telegram_id', 'name', 'preferred_currency')
+#
+#
+# class CurrencySerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Currency
+#         fields = ('pk', 'code', 'name')
+#
+#
+# class CategoryIncomeSerializer(serializers.ModelSerializer):
+#     # user = UserSerializer()
+#
+#     class Meta:
+#         model = CategoryIncome
+#         fields = '__all__'
+#
+#
+# class IncomeSerializer(serializers.ModelSerializer):
+#     user = serializers.HiddenField(default=CurrentUser())
+#     category = serializers.PrimaryKeyRelatedField(queryset=CategoryIncome.objects.filter(user=User().get_user()))
+#
+#     # currency = CurrencySerializer()
+#     # category = CategoryIncomeSerializer()
+#
+#     class Meta:
+#         model = Income
+#         fields = ('pk', 'user', 'amount', 'currency', 'category', 'created_at')
