@@ -5,13 +5,14 @@ from rest_framework import serializers
 # from .models import Currency, Income, CategoryIncome,
 
 
-class UserSerializer(serializers.ModelSerializer):
 
-    class Meta:
-        model = User
-        fields = ('pk', 'username', 'first_name', 'password')
-
-
+# class UserSerializer(serializers.ModelSerializer):
+#
+#     class Meta:
+#         model = User
+#         fields = ('pk', 'username', 'first_name', 'password')
+#
+#
 class CustomUserCreateSerializer(UserCreateSerializer):
     first_name = serializers.CharField()
 
