@@ -2,8 +2,7 @@ from django.contrib.auth.models import User
 from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 
-# from .models import Currency, Income, CategoryIncome,
-
+from .models import Currency
 
 
 # class UserSerializer(serializers.ModelSerializer):
@@ -30,12 +29,12 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 #     class Meta:
 #         model = User
 #         fields = ('pk', 'telegram_id', 'name', 'preferred_currency')
-#
-#
-# class CurrencySerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Currency
-#         fields = ('pk', 'code', 'name')
+
+
+class CurrencySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Currency
+        fields = ('pk', 'code', 'name')
 #
 #
 # class CategoryIncomeSerializer(serializers.ModelSerializer):
