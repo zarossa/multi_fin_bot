@@ -5,3 +5,6 @@ To get started, please type /help or /start.
 '''
 
 REGISTER = 'Кажется, у вас получилось зарегитрироваться. Поздравляю!'
+
+ERROR = 'Something goes wrong. Write to @zarossa'
+SUCCESS = 'Success'
