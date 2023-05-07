@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 
@@ -17,18 +16,6 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
     class Meta(UserCreateSerializer.Meta):
         fields = ('username', 'password', 'first_name')
-#
-#
-# class CategoryPermission:
-#     def __call__(self) -> list:
-#         categories = CategoryIncome.objects.filter(user=CurrentUser())
-#         return categories
-#
-#
-# class UserSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ('pk', 'telegram_id', 'name', 'preferred_currency')
 
 
 class CurrencySerializer(serializers.ModelSerializer):

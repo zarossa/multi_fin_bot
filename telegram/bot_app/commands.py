@@ -17,7 +17,6 @@ PASSWORD = os.getenv('PASSWORD')
 @dp.message_handler(commands='start', state='*')
 async def start(message: types.Message, state: FSMContext):
     await WorkStates.start.set()
-
     token = await login_user(message.from_user)
 
     if not token:

@@ -1,11 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include, re_path
 
-from bot.views import AccountAPIUpdate
-
-# from bot.views import UserAPICreate, UserAPIGet
-# from rest_framework import routers
-
+from bot.views import AccountAPICreate, AccountAPIDestroy
 
 urlpatterns = [
     path('admin/', admin.site.urls),
