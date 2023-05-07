@@ -18,7 +18,7 @@ class BaseModel(models.Model):
 
 class Account(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    currency = models.ForeignKey('Currency', verbose_name='Base currency', on_delete=models.PROTECT, null=True, blank=True)
+    currency = models.ForeignKey('Currency', verbose_name='Base currency', on_delete=models.PROTECT)
 
     def __str__(self):
         return self.user.first_name

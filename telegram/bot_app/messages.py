@@ -8,3 +8,5 @@ REGISTER = 'Кажется, у вас получилось зарегитрир�
 
 ERROR = 'Something goes wrong. Write to @zarossa'
 SUCCESS = 'Success'
+CURRENCY = f"Please select your preferred currency"
+

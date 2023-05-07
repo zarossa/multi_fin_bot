@@ -9,7 +9,7 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ('pk', 'currency')
+        fields = ('user', 'currency', )
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):

@@ -9,3 +9,4 @@ class GameStates(StatesGroup):
 
 class WorkStates(StatesGroup):
     start = State()
+    create_user = State()
