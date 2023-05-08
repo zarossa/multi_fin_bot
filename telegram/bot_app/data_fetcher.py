@@ -7,7 +7,8 @@ USER_API_REGISTER = os.getenv('USER_API_REGISTER')
 USER_API_LOGIN = os.getenv('USER_API_LOGIN')
 USER_API_DELETE = os.getenv('USER_API_DELETE')
 ACCOUNT_API_CREATE = os.getenv('ACCOUNT_API_CREATE')
-PASSWORD = os.getenv('PASSWORD')
+
+CATEGORY_INCOME_API = os.getenv('CATEGORY_INCOME_API')
 
 
 async def login_user(telegram_user: User) -> str | None:
@@ -53,15 +54,26 @@ async def create_account(token: str, currency: str) -> bool:
             return False
 
 
-async def register_user(telegram_user: User, currency: str) -> str | bool:
-    is_created = await create_user(telegram_user)
-    if is_created:
-        token = await login_user(telegram_user)
-        if not token:
-            return False
+class IncomeCategory:
+    def __init__(self, name: str):
+        self.name = name
 
-        is_registered = await create_account(token, currency)
-        if is_registered:
-            return token
-        await delete_user(token)
-        return False
+    @classmethod
+    async def get(cls, token: str) -> list | None:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(CATEGORY_INCOME_API, headers={'Authorization': f'Token {token}'}) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return [cls(category.get('name')) for category in data]
+                return None
+
+    @classmethod
+    async def create(cls, token: str, category_name: str) -> bool:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                    CATEGORY_INCOME_API,
+                    headers={'Authorization': f'Token {token}'},
+                    json={'name': category_name}) as response:
+                if response.status == 201:
+                    return True
+                return False

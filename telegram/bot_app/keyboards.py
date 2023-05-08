@@ -1,10 +1,15 @@
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 
-inline_button_USD = InlineKeyboardButton('USD', callback_data='USD')
-inline_button_RUB = InlineKeyboardButton('RUB', callback_data='RUB')
-inline_button_KZT = InlineKeyboardButton('KZT', callback_data='KZT')
+currencies = ['USD', 'RUB', 'KZT']
 currency_kb = InlineKeyboardMarkup()
 
-currency_kb.add(inline_button_USD)
-currency_kb.add(inline_button_RUB)
-currency_kb.add(inline_button_KZT)
+[currency_kb.add(InlineKeyboardButton(currency, callback_data=currency)) for currency in currencies]
+
+
+async def category_keyboard(is_blank: bool = False):
+    buttons = ['Create new']
+    if not is_blank:
+        buttons.extend(['Delete', 'Edit'])
+    keyboard = InlineKeyboardMarkup()
+    [keyboard.add(InlineKeyboardButton(button, callback_data=button)) for button in buttons]
+    return keyboard
