@@ -3,11 +3,11 @@ import os
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 
-from . import messages
-from .app import dp, bot
-from .data_fetcher import login_user, register_user
-from .keyboards import inline_kb
-from .states import WorkStates
+from .. import messages
+from ..app import dp, bot
+from ..data_fetcher import login_user, register_user
+from ..keyboards import currency_kb
+from ..states import WorkStates
 
 USER_API_REGISTER = os.getenv('USER_API_REGISTER')
 USER_API_LOGIN = os.getenv('USER_API_LOGIN')
@@ -20,7 +20,7 @@ async def start(message: types.Message, state: FSMContext):
     token = await login_user(message.from_user)
 
     if not token:
-        await message.answer(text=messages.CURRENCY, reply_markup=inline_kb)
+        await message.answer(text=messages.CURRENCY, reply_markup=currency_kb)
         await WorkStates.create_user.set()
         return
 
@@ -46,4 +46,4 @@ async def account_creating(callback_query: types.CallbackQuery, state: FSMContex
 @dp.callback_query_handler(state=WorkStates.create_user)
 async def process_invalid_currency_selection(callback_query: types.CallbackQuery):
     message = f"Please select a valid currency"
-    await bot.send_message(chat_id=callback_query.from_user.id, text=message, reply_markup=inline_kb)
+    await bot.send_message(chat_id=callback_query.from_user.id, text=message, reply_markup=currency_kb)
