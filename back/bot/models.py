@@ -30,6 +30,14 @@ class Currency(BaseModel):
 
     def __str__(self):
         return self.code
+
+
+class CategoryIncome(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.user.first_name}. {self.name}"
 #
 #
 # class Income(BaseModel):
@@ -41,14 +49,6 @@ class Currency(BaseModel):
 #
 #     def __str__(self):
 #         return f"{self.user} - {self.amount} {self.currency} (Income)"
-#
-#
-# class CategoryIncome(BaseModel):
-#     user = models.ForeignKey(TelegramUser, on_delete=models.CASCADE)
-#     name = models.CharField(max_length=100)
-#
-#     def __str__(self):
-#         return f"{self.user}. {self.name}"
 #
 #
 # class Expense(BaseModel):

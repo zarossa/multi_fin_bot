@@ -1,7 +1,7 @@
 from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 
-from .models import Currency, Account
+from .models import Currency, Account, CategoryIncome
 
 
 class AccountSerializer(serializers.ModelSerializer):
@@ -19,17 +19,17 @@ class CustomUserCreateSerializer(UserCreateSerializer):
 
 
 class CurrencySerializer(serializers.ModelSerializer):
+
     class Meta:
         model = Currency
         fields = ('pk', 'code', 'name')
-#
-#
-# class CategoryIncomeSerializer(serializers.ModelSerializer):
-#     # user = UserSerializer()
-#
-#     class Meta:
-#         model = CategoryIncome
-#         fields = '__all__'
+
+
+class CategoryIncomeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CategoryIncome
+        fields = ('pk', 'name')
 #
 #
 # class IncomeSerializer(serializers.ModelSerializer):

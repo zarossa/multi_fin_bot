@@ -2,12 +2,17 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-from .models import Account, Currency
+from .models import Account, Currency, CategoryIncome
 
 
 @admin.register(Currency)
 class CurrencyAdmin(admin.ModelAdmin):
     list_display = ['id', 'code', 'name']
+
+
+@admin.register(CategoryIncome)
+class CategoryIncomeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'name']
 
 
 class AccountInline(admin.StackedInline):

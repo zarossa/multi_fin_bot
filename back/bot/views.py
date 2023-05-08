@@ -1,12 +1,13 @@
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-from rest_framework import status
+from rest_framework import status, mixins
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
 
-from .models import Account, Currency
-from .serializers import AccountSerializer
+from .models import Account, Currency, CategoryIncome
+from .serializers import AccountSerializer, CategoryIncomeSerializer
 
 
 class AccountAPICreate(generics.CreateAPIView):
@@ -37,3 +38,20 @@ class AccountAPIDestroy(generics.DestroyAPIView):
         instance = self.get_object()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CategoryIncomeViewSet(mixins.CreateModelMixin,
+                            mixins.RetrieveModelMixin,
+                            mixins.UpdateModelMixin,
+                            mixins.DestroyModelMixin,
+                            mixins.ListModelMixin,
+                            GenericViewSet):
+    queryset = CategoryIncome.objects.all()
+    serializer_class = CategoryIncomeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return CategoryIncome.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
