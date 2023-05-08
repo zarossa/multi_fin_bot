@@ -7,7 +7,7 @@ To get started, please type:
 /category_income to manage your income categories
 '''
 
-REGISTER = 'Кажется, у вас получилось зарегитрироваться. Поздравляю!'
+REGISTER = 'It looks like you have registered. Congratulations!'
 
 ERROR = 'Something goes wrong. Write to @zarossa'
 SUCCESS = 'Success'

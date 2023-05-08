@@ -5,42 +5,43 @@ from aiogram.dispatcher import FSMContext
 
 from .. import messages
 from ..app import dp, bot
-from ..data_fetcher import login_user, register_user
+from ..data_fetcher import Account
 from ..keyboards import currency_kb
 from ..states import WorkStates
-
-USER_API_REGISTER = os.getenv('USER_API_REGISTER')
-USER_API_LOGIN = os.getenv('USER_API_LOGIN')
-PASSWORD = os.getenv('PASSWORD')
 
 
 @dp.message_handler(commands='start', state='*')
 async def start(message: types.Message, state: FSMContext):
     await WorkStates.start.set()
-    token = await login_user(message.from_user)
 
-    if not token:
+    account = Account(message.from_user)
+    if await account.login():
+        async with state.proxy() as data:
+            data['token'] = account.token
+        await message.answer(messages.WELCOME_MESSAGE)
+    else:
         await message.answer(text=messages.CURRENCY, reply_markup=currency_kb)
         await WorkStates.create_user.set()
-        return
-
-    async with state.proxy() as data:
-        data['token'] = token
-    await message.answer(messages.WELCOME_MESSAGE)
+        async with state.proxy() as data:
+            data['account'] = account
 
 
 @dp.callback_query_handler(lambda c: c.data in ['USD', 'RUB', 'KZT'], state=WorkStates.create_user)
 async def account_creating(callback_query: types.CallbackQuery, state: FSMContext):
-    await state.finish()
     currency = callback_query.data
-    await WorkStates.start.set()
-    token = await register_user(callback_query.from_user, currency)
-    if not token:
+    async with state.proxy() as data:
+        account = data.get('account')
+
+    if not account:
         await bot.send_message(chat_id=callback_query.from_user.id, text=messages.ERROR)
         return
-    async with state.proxy() as data:
-        data['token'] = token
-    await bot.send_message(chat_id=callback_query.from_user.id, text=messages.WELCOME_MESSAGE)
+    if await account.register(currency):
+        async with state.proxy() as data:
+            data['token'] = account.token
+        await bot.send_message(chat_id=callback_query.from_user.id, text=messages.WELCOME_MESSAGE)
+    else:
+        await bot.send_message(chat_id=callback_query.from_user.id, text=messages.ERROR)
+    await WorkStates.start.set()
 
 
 @dp.callback_query_handler(state=WorkStates.create_user)
