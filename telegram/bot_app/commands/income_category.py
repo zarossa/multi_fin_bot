@@ -5,18 +5,18 @@ from .. import messages
 from ..app import dp, bot
 from ..data_fetcher import IncomeCategory
 from ..keyboards import category_keyboard
-from ..states import WorkStates
+from ..states import BaseStates, CategoryIncomeStates
 
 
-@dp.message_handler(commands='category_income', state=[WorkStates.start, WorkStates.category_income])
+@dp.message_handler(commands='category_income', state=[BaseStates, CategoryIncomeStates])
 async def start(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         token = data.get('token')
         if not token:
             await message.answer(text=messages.ERROR)
-            await WorkStates.start.set()
+            await BaseStates.start.set()
             return
-        await WorkStates.category_income.set()
+        await CategoryIncomeStates.base.set()
         data['token'] = token
 
     income_categories = await IncomeCategory.get(token)
@@ -33,17 +33,17 @@ async def start(message: types.Message, state: FSMContext):
         await message.answer(f'You don\'t have any category', reply_markup=keyboard)
 
 
-@dp.callback_query_handler(lambda c: c.data == 'Create new', state=WorkStates.category_income)
+@dp.callback_query_handler(lambda c: c.data == 'Create new', state=CategoryIncomeStates.base)
 async def create_category_income(callback_query: types.CallbackQuery, state: FSMContext):
     await bot.send_message(callback_query.from_user.id, "Please provide the name of a new income category")
     async with state.proxy() as data:
         token = data.get('token')
-    await WorkStates.category_income_create.set()
+    await CategoryIncomeStates.create.set()
     async with state.proxy() as data:
         data['token'] = token
 
 
-@dp.message_handler(state=WorkStates.category_income_create)
+@dp.message_handler(state=CategoryIncomeStates.create)
 async def create_category_income_process(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         token = data.get('token')
@@ -57,5 +57,5 @@ async def create_category_income_process(message: types.Message, state: FSMConte
             await message.answer(text=f'You create a new category "{category_name}"')
         else:
             await message.answer(text='Error creating category')
-        await WorkStates.category_income.set()
+        await CategoryIncomeStates.base.set()
         await start(message, state)
