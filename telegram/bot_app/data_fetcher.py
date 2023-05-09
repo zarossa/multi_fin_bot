@@ -108,8 +108,15 @@ class IncomeCategory:
                     headers={'Authorization': f'Token {self.token}'},
                     json={'name': name}) as response:
                 if response.status == 200:
-                    data = await response.json()
-                    print(data)
+                    return True
+                return False
+
+    async def delete(self, pk: int) -> bool:
+        async with aiohttp.ClientSession() as session:
+            async with session.delete(
+                    f'{CATEGORY_INCOME_API}{pk}/',
+                    headers={'Authorization': f'Token {self.token}'}) as response:
+                if response.status == 204:
                     return True
                 return False
 

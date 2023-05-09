@@ -4,7 +4,7 @@ from aiogram.dispatcher import FSMContext
 from .. import messages
 from ..app import dp, bot
 from ..data_fetcher import IncomeCategory
-from ..keyboards import category_keyboard, keyboard_from_list, keyboard_from_dict
+from ..keyboards import category_keyboard, keyboard_from_dict
 from ..states import BaseStates, CategoryIncomeStates
 
 
@@ -113,3 +113,37 @@ async def edit_category_income_get_name(message: types.Message, state: FSMContex
             await message.answer(text='Error renaming category')
         await CategoryIncomeStates.base.set()
         await start(message, state)
+
+
+@dp.callback_query_handler(lambda c: c.data == 'Delete', state=CategoryIncomeStates.base)
+async def delete_category_income(callback_query: types.CallbackQuery, state: FSMContext):
+    async with state.proxy() as data:
+        category = data.get('data')
+        if not category.token:
+            await bot.send_message(chat_id=callback_query.from_user.id, text=messages.ERROR)
+            await BaseStates.start.set()
+            return
+        await category.get()
+        await bot.send_message(chat_id=callback_query.from_user.id,
+                               text="Please choose an income category to delete",
+                               reply_markup=await keyboard_from_dict(category.categories))
+        await CategoryIncomeStates.delete.set()
+        data['data'] = category
+
+
+@dp.callback_query_handler(state=CategoryIncomeStates.delete)
+async def delete_category_income_process(callback_query: types.CallbackQuery, state: FSMContext):
+    async with state.proxy() as data:
+        category = data.get('data')
+        if not category.token:
+            await bot.send_message(chat_id=callback_query.from_user.id, text=messages.ERROR)
+            return
+
+        category_id = callback_query.data
+        success = await category.delete(category_id)
+        if success:
+            await bot.send_message(chat_id=callback_query.from_user.id, text=f'You delete the category')
+        else:
+            await bot.send_message(chat_id=callback_query.from_user.id, text='Error deleting category')
+        await CategoryIncomeStates.base.set()
+        await start(callback_query.message, state)

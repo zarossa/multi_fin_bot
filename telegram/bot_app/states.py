@@ -12,5 +12,6 @@ class AccountStates(StatesGroup):
 class CategoryIncomeStates(StatesGroup):
     base = State()
     create = State()
+    delete = State()
     edit = State()
     edit_name = State()
