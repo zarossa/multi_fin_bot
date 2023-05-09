@@ -4,7 +4,7 @@ from aiogram.dispatcher import FSMContext
 from .. import messages
 from ..app import dp, bot
 from ..data_fetcher import IncomeCategory
-from ..keyboards import category_keyboard, keyboard_from_dict
+from ..keyboards import base_keyboard, keyboard_from_dict
 from ..states import BaseStates, CategoryIncomeStates
 
 
@@ -26,11 +26,11 @@ async def start(message: types.Message, state: FSMContext):
         return
     if income_categories:
         categories_list = '\n'.join([f'- {category.get("name")}' for category in income_categories])
-        keyboard = await category_keyboard()
+        keyboard = await base_keyboard()
         await message.answer(f'Your categories:\n{categories_list}', reply_markup=keyboard)
         return
     else:
-        keyboard = await category_keyboard(is_blank=True)
+        keyboard = await base_keyboard(is_blank=True)
         await message.answer(f'You don\'t have any category', reply_markup=keyboard)
 
 

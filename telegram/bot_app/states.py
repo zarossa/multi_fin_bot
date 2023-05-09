@@ -15,3 +15,10 @@ class CategoryIncomeStates(StatesGroup):
     delete = State()
     edit = State()
     edit_name = State()
+
+
+class IncomeStates(StatesGroup):
+    base = State()
+    create = State()
+    create_currency = State()
+    delete = State()

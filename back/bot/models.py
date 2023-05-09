@@ -49,8 +49,8 @@ class CategoryIncome(BaseModel):
 class Income(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    currency = models.ForeignKey(Currency, on_delete=models.PROTECT)
-    category = models.ForeignKey('CategoryIncome', on_delete=models.PROTECT)
+    currency = models.ForeignKey(Currency, on_delete=models.RESTRICT)
+    category = models.ForeignKey('CategoryIncome', on_delete=models.RESTRICT)
     converted_amount = models.DecimalField(max_digits=10, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
 

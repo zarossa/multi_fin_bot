@@ -1,7 +1,7 @@
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 
 
-async def category_keyboard(is_blank: bool = False) -> InlineKeyboardMarkup:
+async def base_keyboard(is_blank: bool = False) -> InlineKeyboardMarkup:
     keyboard = InlineKeyboardMarkup()
     buttons = ['Create new']
     if not is_blank:
