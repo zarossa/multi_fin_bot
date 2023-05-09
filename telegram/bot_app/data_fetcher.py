@@ -76,25 +76,40 @@ class Account:
 
 
 class IncomeCategory:
-    def __init__(self, name: str):
-        self.name = name
+    def __init__(self, token: str):
+        self.token = token
+        self.categories = []
 
-    @classmethod
-    async def get(cls, token: str) -> list | None:
+    async def get(self) -> list | None:
         async with aiohttp.ClientSession() as session:
-            async with session.get(CATEGORY_INCOME_API, headers={'Authorization': f'Token {token}'}) as response:
+            async with session.get(
+                    CATEGORY_INCOME_API,
+                    headers={'Authorization': f'Token {self.token}'}) as response:
                 if response.status == 200:
                     data = await response.json()
-                    return [cls(category.get('name')) for category in data]
+                    self.categories = data
+                    return data  # [cls(category.get('name')) for category in data]
                 return None
 
-    @classmethod
-    async def create(cls, token: str, category_name: str) -> bool:
+    async def create(self, category_name: str) -> bool:
         async with aiohttp.ClientSession() as session:
             async with session.post(
                     CATEGORY_INCOME_API,
-                    headers={'Authorization': f'Token {token}'},
+                    headers={'Authorization': f'Token {self.token}'},
                     json={'name': category_name}) as response:
                 if response.status == 201:
                     return True
                 return False
+
+    async def update(self, pk: int, name: str) -> bool:
+        async with aiohttp.ClientSession() as session:
+            async with session.put(
+                    f'{CATEGORY_INCOME_API}{pk}/',
+                    headers={'Authorization': f'Token {self.token}'},
+                    json={'name': name}) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    print(data)
+                    return True
+                return False
+

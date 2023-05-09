@@ -31,6 +31,11 @@ class Currency(BaseModel):
     def __str__(self):
         return self.code
 
+    class Meta:
+        # verbose_name = 'Запись'
+        # verbose_name_plural = 'Записи'
+        ordering = ['id']
+
 
 class CategoryIncome(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -38,6 +43,9 @@ class CategoryIncome(BaseModel):
 
     def __str__(self):
         return f"{self.user.first_name}. {self.name}"
+
+    class Meta:
+        ordering = ['id']
 #
 #
 # class Income(BaseModel):

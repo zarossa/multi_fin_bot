@@ -13,3 +13,4 @@ class CategoryIncomeStates(StatesGroup):
     base = State()
     create = State()
     edit = State()
+    edit_name = State()
