@@ -6,8 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from .models import Account, Currency, CategoryIncome
-from .serializers import AccountSerializer, CategoryIncomeSerializer
+from .models import Account, Currency, CategoryIncome, Income
+from .serializers import AccountSerializer, CategoryIncomeSerializer, IncomeSerializer
 
 
 class AccountAPICreate(generics.CreateAPIView):
@@ -52,6 +52,23 @@ class CategoryIncomeViewSet(mixins.CreateModelMixin,
 
     def get_queryset(self):
         return CategoryIncome.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class IncomeViewSet(mixins.CreateModelMixin,
+                    mixins.RetrieveModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.DestroyModelMixin,
+                    mixins.ListModelMixin,
+                    GenericViewSet):
+    queryset = Income.objects.all()
+    serializer_class = IncomeSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Income.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

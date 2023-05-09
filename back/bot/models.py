@@ -32,8 +32,6 @@ class Currency(BaseModel):
         return self.code
 
     class Meta:
-        # verbose_name = 'Запись'
-        # verbose_name_plural = 'Записи'
         ordering = ['id']
 
 
@@ -46,18 +44,22 @@ class CategoryIncome(BaseModel):
 
     class Meta:
         ordering = ['id']
-#
-#
-# class Income(BaseModel):
-#     user = models.ForeignKey(TelegramUser, on_delete=models.CASCADE)
-#     amount = models.DecimalField(max_digits=10, decimal_places=2)
-#     currency = models.ForeignKey(Currency, on_delete=models.CASCADE)
-#     category = models.ForeignKey('CategoryIncome', on_delete=models.PROTECT)
-#     created_at = models.DateTimeField(auto_now_add=True)
-#
-#     def __str__(self):
-#         return f"{self.user} - {self.amount} {self.currency} (Income)"
-#
+
+
+class Income(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    currency = models.ForeignKey(Currency, on_delete=models.PROTECT)
+    category = models.ForeignKey('CategoryIncome', on_delete=models.PROTECT)
+    converted_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user} - {self.amount} {self.currency} (Income)"
+
+    class Meta:
+        ordering = ['id']
+
 #
 # class Expense(BaseModel):
 #     user = models.ForeignKey(TelegramUser, on_delete=models.CASCADE)
