@@ -35,11 +35,14 @@ async def start(message: types.Message, state: FSMContext):
 
 @dp.callback_query_handler(lambda c: c.data == 'Create new', state=CategoryIncomeStates.base)
 async def create_category_income(callback_query: types.CallbackQuery, state: FSMContext):
-    await bot.send_message(callback_query.from_user.id, "Please provide the name of a new income category")
     async with state.proxy() as data:
         token = data.get('token')
-    await CategoryIncomeStates.create.set()
-    async with state.proxy() as data:
+        if not token:
+            await bot.send_message(chat_id=callback_query.from_user.id, text=messages.ERROR)
+            await BaseStates.start.set()
+            return
+        await bot.send_message(callback_query.from_user.id, "Please provide the name of a new income category")
+        await CategoryIncomeStates.create.set()
         data['token'] = token
 
 
