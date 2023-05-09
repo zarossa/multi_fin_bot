@@ -5,12 +5,13 @@ from aiogram.types import User
 
 PASSWORD = os.getenv('PASSWORD')
 
-USER_API_REGISTER = os.getenv('USER_API_REGISTER')
-USER_API_LOGIN = os.getenv('USER_API_LOGIN')
-USER_API_DELETE = os.getenv('USER_API_DELETE')
-ACCOUNT_API_CREATE = os.getenv('ACCOUNT_API_CREATE')
+HOST = os.getenv('USER_API_REGISTER')
+USER_API_REGISTER = f"{HOST}{os.getenv('USER_API_REGISTER')}"
+USER_API_LOGIN = f"{HOST}{os.getenv('USER_API_LOGIN')}"
+USER_API_DELETE = f"{HOST}{os.getenv('USER_API_DELETE')}"
+ACCOUNT_API_CREATE = f"{HOST}{os.getenv('ACCOUNT_API_CREATE')}"
 
-CATEGORY_INCOME_API = os.getenv('CATEGORY_INCOME_API')
+CATEGORY_INCOME_API = f"{HOST}{os.getenv('CATEGORY_INCOME_API')}"
 
 
 class Account:
