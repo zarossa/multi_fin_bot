@@ -14,6 +14,9 @@ ACCOUNT_API_CREATE = f"{HOST}{os.getenv('ACCOUNT_API_CREATE')}"
 CATEGORY_INCOME_API = f"{HOST}{os.getenv('CATEGORY_INCOME_API')}"
 INCOME_API = f"{HOST}{os.getenv('INCOME_API')}"
 
+CATEGORY_EXPENSE_API = f"{HOST}{os.getenv('CATEGORY_EXPENSE_API')}"
+EXPENSE_API = f"{HOST}{os.getenv('EXPENSE_API')}"
+
 
 class Account:
     def __init__(self, telegram_user: User, password: str = PASSWORD):
@@ -153,6 +156,88 @@ class Income:
         async with aiohttp.ClientSession() as session:
             async with session.delete(
                     f'{INCOME_API}{pk}/',
+                    headers={'Authorization': f'Token {self.token}'}) as response:
+                if response.status == 204:
+                    return True
+                return False
+
+
+class ExpenseCategory:
+    def __init__(self, token: str):
+        self.token = token
+        self.categories = []
+
+    async def get(self) -> list | None:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                    CATEGORY_EXPENSE_API,
+                    headers={'Authorization': f'Token {self.token}'}) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    self.categories = data
+                    return data
+                return None
+
+    async def create(self, category_name: str) -> bool:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                    CATEGORY_EXPENSE_API,
+                    headers={'Authorization': f'Token {self.token}'},
+                    json={'name': category_name}) as response:
+                if response.status == 201:
+                    return True
+                return False
+
+    async def update(self, pk: int, name: str) -> bool:
+        async with aiohttp.ClientSession() as session:
+            async with session.put(
+                    f'{CATEGORY_EXPENSE_API}{pk}/',
+                    headers={'Authorization': f'Token {self.token}'},
+                    json={'name': name}) as response:
+                if response.status == 200:
+                    return True
+                return False
+
+    async def delete(self, pk: int) -> bool:
+        async with aiohttp.ClientSession() as session:
+            async with session.delete(
+                    f'{CATEGORY_EXPENSE_API}{pk}/',
+                    headers={'Authorization': f'Token {self.token}'}) as response:
+                if response.status == 204:
+                    return True
+                return False
+
+
+class Expense:
+    def __init__(self, token: str):
+        self.token = token
+        self.incomes = []
+
+    async def get(self) -> list | None:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                    EXPENSE_API,
+                    headers={'Authorization': f'Token {self.token}'}) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    self.incomes = data
+                    return data
+                return None
+
+    async def create(self, amount: float, currency: int, category: int) -> bool:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                    EXPENSE_API,
+                    headers={'Authorization': f'Token {self.token}'},
+                    json={'amount': float(amount), 'currency': currency, 'category': category}) as response:
+                if response.status == 201:
+                    return True
+                return False
+
+    async def delete(self, pk: int) -> bool:
+        async with aiohttp.ClientSession() as session:
+            async with session.delete(
+                    f'{EXPENSE_API}{pk}/',
                     headers={'Authorization': f'Token {self.token}'}) as response:
                 if response.status == 204:
                     return True

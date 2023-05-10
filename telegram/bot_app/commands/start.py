@@ -18,7 +18,7 @@ async def start(message: types.Message, state: FSMContext):
     if await account.login():
         async with state.proxy() as data:
             data['token'] = account.token
-        keyboard = await keyboard_from_list(['Income', 'Expense\n**don\'t work**'])
+        keyboard = await keyboard_from_list(['Income', 'Expense'])
         await message.answer(text=messages.WELCOME_MESSAGE, reply_markup=keyboard)
     else:
         keyboard = await keyboard_from_list(['USD', 'RUB', 'KZT'])
@@ -40,7 +40,7 @@ async def account_creating(callback_query: types.CallbackQuery, state: FSMContex
     if await account.register(currency):
         async with state.proxy() as data:
             data['token'] = account.token
-        keyboard = await keyboard_from_list(['Income', 'Expense\n**don\'t work**'])
+        keyboard = await keyboard_from_list(['Income', 'Expense'])
         await bot.send_message(chat_id=callback_query.from_user.id, text=messages.WELCOME_MESSAGE,
                                reply_markup=keyboard)
     else:
