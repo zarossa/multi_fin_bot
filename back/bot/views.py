@@ -6,8 +6,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from .models import Account, Currency, CategoryIncome, Income
-from .serializers import AccountSerializer, CategoryIncomeSerializer, IncomeSerializer
+from .models import Account, Currency, CategoryIncome, Income, CategoryExpense, Expense
+from .serializers import AccountSerializer, CategoryIncomeSerializer, IncomeSerializer, CategoryExpenseSerializer, \
+    ExpenseSerializer
 
 
 class AccountAPICreate(generics.CreateAPIView):
@@ -69,6 +70,40 @@ class IncomeViewSet(mixins.CreateModelMixin,
 
     def get_queryset(self):
         return Income.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class CategoryExpenseViewSet(mixins.CreateModelMixin,
+                             mixins.RetrieveModelMixin,
+                             mixins.UpdateModelMixin,
+                             mixins.DestroyModelMixin,
+                             mixins.ListModelMixin,
+                             GenericViewSet):
+    queryset = CategoryExpense.objects.all()
+    serializer_class = CategoryExpenseSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return CategoryExpense.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class ExpenseViewSet(mixins.CreateModelMixin,
+                     mixins.RetrieveModelMixin,
+                     mixins.UpdateModelMixin,
+                     mixins.DestroyModelMixin,
+                     mixins.ListModelMixin,
+                     GenericViewSet):
+    queryset = Expense.objects.all()
+    serializer_class = ExpenseSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Expense.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

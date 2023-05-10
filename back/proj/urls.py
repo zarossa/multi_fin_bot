@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include, re_path
 
-from bot.routers import category_income, income
+from bot.routers import category_income, income, category_expense, expense
 from bot.views import AccountAPICreate, AccountAPIDestroy
 
 urlpatterns = [
@@ -12,4 +12,6 @@ urlpatterns = [
     re_path(r'^auth/', include('djoser.urls.authtoken')),
     path('api/v1/', include(category_income.urls)),
     path('api/v1/', include(income.urls)),
+    path('api/v1/', include(category_expense.urls)),
+    path('api/v1/', include(expense.urls)),
 ]
