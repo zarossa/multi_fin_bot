@@ -9,7 +9,8 @@ class AccountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ('user', 'currency', )
+        fields = ('user', 'currency', 'amount')
+        read_only_fields = ('amount',)
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):

@@ -30,6 +30,7 @@ class Currency(BaseModel):
 class Account(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     currency = models.ForeignKey(Currency, verbose_name='Base currency', on_delete=models.PROTECT)
+    amount = models.DecimalField(default=0, max_digits=10, decimal_places=2, verbose_name='Amount of money')
 
     def __str__(self):
         return self.user.first_name

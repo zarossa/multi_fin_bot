@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import status, mixins
 from rest_framework import generics
@@ -71,8 +71,14 @@ class IncomeViewSet(mixins.CreateModelMixin,
     def get_queryset(self):
         return Income.objects.filter(user=self.request.user)
 
+    @transaction.atomic
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        user = self.request.user
+        income = serializer.save(user=user)
+
+        account = user.account
+        account.amount += income.converted_amount
+        account.save()
 
 
 class CategoryExpenseViewSet(mixins.CreateModelMixin,
@@ -105,5 +111,11 @@ class ExpenseViewSet(mixins.CreateModelMixin,
     def get_queryset(self):
         return Expense.objects.filter(user=self.request.user)
 
+    @transaction.atomic
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        user = self.request.user
+        expense = serializer.save(user=user)
+
+        account = user.account
+        account.amount -= expense.converted_amount
+        account.save()
