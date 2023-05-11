@@ -21,7 +21,7 @@ async def start(message: types.Message, state: FSMContext):
         keyboard = await keyboard_from_list(['Income', 'Expense'])
         await message.answer(text=messages.WELCOME_MESSAGE, reply_markup=keyboard)
     else:
-        keyboard = await keyboard_from_list(['USD', 'RUB', 'KZT'])
+        keyboard = await keyboard_from_list(['USD', 'RUB', 'KZT', 'THB'])
         await message.answer(text=messages.CURRENCY, reply_markup=keyboard)
         await AccountStates.create.set()
         async with state.proxy() as data:
@@ -45,7 +45,7 @@ async def check(message: types.Message, state: FSMContext):
         await message.answer(text=f'Your amount of money is {amount}')
 
 
-@dp.callback_query_handler(lambda c: c.data in ['USD', 'RUB', 'KZT'], state=AccountStates)
+@dp.callback_query_handler(lambda c: c.data in ['USD', 'RUB', 'KZT', 'THB'], state=AccountStates)
 async def account_creating(callback_query: types.CallbackQuery, state: FSMContext):
     currency = callback_query.data
     async with state.proxy() as data:
@@ -68,5 +68,5 @@ async def account_creating(callback_query: types.CallbackQuery, state: FSMContex
 @dp.callback_query_handler(state=AccountStates)
 async def process_invalid_currency_selection(callback_query: types.CallbackQuery):
     message = f"Please select a valid currency"
-    keyboard = await keyboard_from_list(['USD', 'RUB', 'KZT'])
+    keyboard = await keyboard_from_list(['USD', 'RUB', 'KZT', 'THB'])
     await bot.send_message(chat_id=callback_query.from_user.id, text=message, reply_markup=keyboard)

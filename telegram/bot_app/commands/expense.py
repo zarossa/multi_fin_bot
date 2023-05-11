@@ -47,7 +47,8 @@ async def create_expense(callback_query: types.CallbackQuery, state: FSMContext)
         await ExpenseStates.create_currency.set()
         keyboard = await keyboard_from_dict([{'pk': 1, 'name': 'USD'},
                                              {'pk': 2, 'name': 'RUB'},
-                                             {'pk': 3, 'name': 'KZT'}, ])
+                                             {'pk': 3, 'name': 'KZT'},
+                                             {'pk': 4, 'name': 'THB'}, ])
         await bot.send_message(callback_query.from_user.id, "Choose amount currency:", reply_markup=keyboard)
 
 
