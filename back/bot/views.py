@@ -10,18 +10,48 @@ from .serializers import AccountSerializer, CategoryIncomeSerializer, IncomeSeri
     ExpenseSerializer
 
 
+class AuthViewSet(GenericViewSet):
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class BaseViewSet(AuthViewSet,
+                  mixins.CreateModelMixin,
+                  mixins.RetrieveModelMixin,
+                  mixins.UpdateModelMixin,
+                  mixins.DestroyModelMixin,
+                  mixins.ListModelMixin):
+    pass
+
+
+class TransactionViewSet(BaseViewSet):
+    @transaction.atomic
+    def perform_create(self, serializer):
+        user = self.request.user
+        transact = serializer.save(user=user)
+
+        account = user.account
+        account.amount += self.get_amount_change(transact)
+        account.save()
+
+    def get_amount_change(self, transact):
+        raise NotImplementedError("Subclasses must implement this method")
+
+
 class AccountViewSet(mixins.CreateModelMixin,
                      mixins.RetrieveModelMixin,
                      mixins.DestroyModelMixin,
-                     GenericViewSet):
+                     AuthViewSet):
+    queryset = Account.objects.all()
     serializer_class = AccountSerializer
-    permission_classes = [IsAuthenticated]
 
     def get_object(self):
         return get_object_or_404(self.get_queryset())
-
-    def get_queryset(self):
-        return Account.objects.filter(user=self.request.user)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -45,81 +75,27 @@ class AccountViewSet(mixins.CreateModelMixin,
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CategoryIncomeViewSet(mixins.CreateModelMixin,
-                            mixins.RetrieveModelMixin,
-                            mixins.UpdateModelMixin,
-                            mixins.DestroyModelMixin,
-                            mixins.ListModelMixin,
-                            GenericViewSet):
+class CategoryIncomeViewSet(BaseViewSet):
     queryset = CategoryIncome.objects.all()
     serializer_class = CategoryIncomeSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return CategoryIncome.objects.filter(user=self.request.user)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
 
 
-class IncomeViewSet(mixins.CreateModelMixin,
-                    mixins.RetrieveModelMixin,
-                    mixins.UpdateModelMixin,
-                    mixins.DestroyModelMixin,
-                    mixins.ListModelMixin,
-                    GenericViewSet):
+class IncomeViewSet(TransactionViewSet):
     queryset = Income.objects.all()
     serializer_class = IncomeSerializer
-    permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        return Income.objects.filter(user=self.request.user)
-
-    @transaction.atomic
-    def perform_create(self, serializer):
-        user = self.request.user
-        income = serializer.save(user=user)
-
-        account = user.account
-        account.amount += income.converted_amount
-        account.save()
+    def get_amount_change(self, income):
+        return income.converted_amount
 
 
-class CategoryExpenseViewSet(mixins.CreateModelMixin,
-                             mixins.RetrieveModelMixin,
-                             mixins.UpdateModelMixin,
-                             mixins.DestroyModelMixin,
-                             mixins.ListModelMixin,
-                             GenericViewSet):
+class CategoryExpenseViewSet(BaseViewSet):
     queryset = CategoryExpense.objects.all()
     serializer_class = CategoryExpenseSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return CategoryExpense.objects.filter(user=self.request.user)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
 
 
-class ExpenseViewSet(mixins.CreateModelMixin,
-                     mixins.RetrieveModelMixin,
-                     mixins.UpdateModelMixin,
-                     mixins.DestroyModelMixin,
-                     mixins.ListModelMixin,
-                     GenericViewSet):
+class ExpenseViewSet(TransactionViewSet):
     queryset = Expense.objects.all()
     serializer_class = ExpenseSerializer
-    permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        return Expense.objects.filter(user=self.request.user)
-
-    @transaction.atomic
-    def perform_create(self, serializer):
-        user = self.request.user
-        expense = serializer.save(user=user)
-
-        account = user.account
-        account.amount -= expense.converted_amount
-        account.save()
+    def get_amount_change(self, expense):
+        return -expense.converted_amount
