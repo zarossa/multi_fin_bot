@@ -8,8 +8,7 @@ PASSWORD = os.getenv('PASSWORD')
 HOST = os.getenv('HOST')
 USER_API_REGISTER = f"{HOST}{os.getenv('USER_API_REGISTER')}"
 USER_API_LOGIN = f"{HOST}{os.getenv('USER_API_LOGIN')}"
-USER_API_DELETE = f"{HOST}{os.getenv('USER_API_DELETE')}"
-ACCOUNT_API_CREATE = f"{HOST}{os.getenv('ACCOUNT_API_CREATE')}"
+ACCOUNT_API = f"{HOST}{os.getenv('ACCOUNT_API')}"
 
 CATEGORY_INCOME_API = f"{HOST}{os.getenv('CATEGORY_INCOME_API')}"
 INCOME_API = f"{HOST}{os.getenv('INCOME_API')}"
@@ -51,7 +50,7 @@ class Account:
     async def _delete_user(self) -> bool:
         async with aiohttp.ClientSession() as session:
             async with session.delete(
-                    USER_API_DELETE,
+                    ACCOUNT_API,
                     headers={'Authorization': f'Token {self.token}'}) as response:
                 if response.status == 204:
                     return True
@@ -71,7 +70,7 @@ class Account:
     async def _create_account(self, currency: str) -> bool:
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                    ACCOUNT_API_CREATE,
+                    ACCOUNT_API,
                     headers={'Authorization': f'Token {self.token}'},
                     json={'currency_code': currency}) as response:
                 if response.status == 201:

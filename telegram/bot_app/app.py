@@ -10,5 +10,3 @@ BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
-
-
