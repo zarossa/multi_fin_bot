@@ -14,17 +14,16 @@ class BaseModel(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ['id']
 
 
 class Currency(BaseModel):
     code = models.CharField(max_length=5, unique=True)
     name = models.CharField(max_length=50)
+    rate = models.DecimalField(default=1, max_digits=20, decimal_places=10)
 
     def __str__(self):
         return self.code
-
-    class Meta:
-        ordering = ['id']
 
 
 class Account(BaseModel):
@@ -36,15 +35,20 @@ class Account(BaseModel):
         return self.user.first_name
 
 
+class AccountCurrency(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    currency = models.ForeignKey(Currency, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return f"{self.user.first_name}. {self.currency}"
+
+
 class CategoryIncome(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return f"{self.user.first_name}. {self.name}"
-
-    class Meta:
-        ordering = ['id']
 
 
 class Income(BaseModel):
@@ -56,10 +60,7 @@ class Income(BaseModel):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user} - {self.amount} {self.currency} (Income)"
-
-    class Meta:
-        ordering = ['id']
+        return f"{self.user.first_name} - {self.amount} {self.currency} (Income)"
 
 
 class CategoryExpense(BaseModel):
@@ -68,9 +69,6 @@ class CategoryExpense(BaseModel):
 
     def __str__(self):
         return f"{self.user.first_name}. {self.name}"
-
-    class Meta:
-        ordering = ['id']
 
 
 class Expense(BaseModel):
@@ -82,7 +80,4 @@ class Expense(BaseModel):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user} - {self.amount} {self.currency} (Expense)"
-
-    class Meta:
-        ordering = ['id']
+        return f"{self.user.first_name} - {self.amount} {self.currency} (Expense)"

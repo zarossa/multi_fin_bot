@@ -1,13 +1,14 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import status, mixins
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from .models import Account, Currency, CategoryIncome, Income, CategoryExpense, Expense
-from .serializers import AccountSerializer, CategoryIncomeSerializer, IncomeSerializer, CategoryExpenseSerializer, \
-    ExpenseSerializer
+from .models import Account, Currency, AccountCurrency, CategoryIncome, Income, CategoryExpense, Expense
+from .serializers import AccountSerializer, AccountCurrencySerializer, CategoryIncomeSerializer, IncomeSerializer, \
+    CategoryExpenseSerializer, ExpenseSerializer, CurrencySerializer
 
 
 class AuthViewSet(GenericViewSet):
@@ -73,6 +74,22 @@ class AccountViewSet(mixins.CreateModelMixin,
         instance = request.user
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class CurrencyViewSet(AuthViewSet,
+                      mixins.ListModelMixin,
+                      mixins.CreateModelMixin,
+                      mixins.RetrieveModelMixin,
+                      mixins.UpdateModelMixin,
+                      mixins.DestroyModelMixin):
+    queryset = AccountCurrency.objects.all()
+    serializer_class = AccountCurrencySerializer
+
+    @action(methods=['get'], detail=False)
+    def all(self, request):
+        currencies = Currency.objects.all()
+        serializer = CurrencySerializer(currencies, many=True)
+        return Response(serializer.data)
 
 
 class CategoryIncomeViewSet(BaseViewSet):

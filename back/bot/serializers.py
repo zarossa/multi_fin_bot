@@ -1,7 +1,7 @@
 from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 
-from .models import Currency, Account, CategoryIncome, Income, CategoryExpense, Expense
+from .models import Currency, Account, CategoryIncome, Income, CategoryExpense, Expense, AccountCurrency
 from .scripts.currency_exchange import convert
 
 
@@ -24,7 +24,14 @@ class CurrencySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Currency
-        fields = ('pk', 'code', 'name')
+        fields = ('pk', 'code', 'name', 'rate')
+
+
+class AccountCurrencySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AccountCurrency
+        fields = ('pk', 'currency')
 
 
 class CategoryIncomeSerializer(serializers.ModelSerializer):

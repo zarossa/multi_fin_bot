@@ -2,12 +2,17 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-from .models import Account, Currency, CategoryIncome, Income, CategoryExpense, Expense
+from .models import Account, Currency, CategoryIncome, Income, CategoryExpense, Expense, AccountCurrency
 
 
 @admin.register(Currency)
 class CurrencyAdmin(admin.ModelAdmin):
-    list_display = ['id', 'code', 'name']
+    list_display = ['id', 'code', 'name', 'rate']
+
+
+@admin.register(AccountCurrency)
+class AccountCurrencyAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'currency']
 
 
 @admin.register(CategoryIncome)
