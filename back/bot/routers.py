@@ -1,6 +1,26 @@
 from rest_framework import routers
 
-from bot.views import CategoryIncomeViewSet, IncomeViewSet, CategoryExpenseViewSet, ExpenseViewSet
+from bot.views import CategoryIncomeViewSet, IncomeViewSet, CategoryExpenseViewSet, ExpenseViewSet, AccountViewSet
+
+
+class AccountRouter(routers.SimpleRouter):
+    routes = [
+        routers.Route(
+            url=r'^{prefix}{trailing_slash}$',
+            mapping={
+                'get': 'retrieve',
+                'delete': 'destroy',
+                'post': 'create',
+            },
+            name='{basename}-detail',
+            detail=True,
+            initkwargs={'suffix': 'Detail'}
+        )
+    ]
+
+
+account = AccountRouter()
+account.register(r'account', AccountViewSet, basename='account')
 
 category_income = routers.SimpleRouter()
 category_income.register(r'category_income', CategoryIncomeViewSet, basename='category_income')
