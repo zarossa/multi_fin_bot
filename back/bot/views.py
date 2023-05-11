@@ -18,11 +18,15 @@ class AccountViewSet(mixins.CreateModelMixin,
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
-        obj = self.queryset.get(user=self.request.user)
-        return obj
+        return get_object_or_404(self.get_queryset())
 
     def get_queryset(self):
         return Account.objects.filter(user=self.request.user)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         currency_code = request.data.get('currency_code')
