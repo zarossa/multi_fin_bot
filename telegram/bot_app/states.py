@@ -22,3 +22,18 @@ class IncomeStates(StatesGroup):
     create = State()
     create_currency = State()
     delete = State()
+
+
+class CategoryExpenseStates(StatesGroup):
+    base = State()
+    create = State()
+    delete = State()
+    edit = State()
+    edit_name = State()
+
+
+class ExpenseStates(StatesGroup):
+    base = State()
+    create = State()
+    create_currency = State()
+    delete = State()

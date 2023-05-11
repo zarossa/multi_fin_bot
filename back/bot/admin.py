@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-from .models import Account, Currency, CategoryIncome, Income
+from .models import Account, Currency, CategoryIncome, Income, CategoryExpense, Expense
 
 
 @admin.register(Currency)
@@ -17,6 +17,16 @@ class CategoryIncomeAdmin(admin.ModelAdmin):
 
 @admin.register(Income)
 class IncomeAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'amount', 'currency', 'category', 'converted_amount', 'created_at']
+
+
+@admin.register(CategoryExpense)
+class CategoryExpenseAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'name']
+
+
+@admin.register(Expense)
+class ExpenseAdmin(admin.ModelAdmin):
     list_display = ['id', 'user', 'amount', 'currency', 'category', 'converted_amount', 'created_at']
 
 
