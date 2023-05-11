@@ -28,6 +28,23 @@ async def start(message: types.Message, state: FSMContext):
             data['account'] = account
 
 
+@dp.message_handler(commands='check', state='*')
+async def check(message: types.Message, state: FSMContext):
+    await BaseStates.start.set()
+    async with state.proxy() as data:
+        token = data.get('token')
+        if not token:
+            await message.answer(text=messages.ERROR)
+            return
+        account = Account(message.from_user, token=token)
+        res = await account.get()
+        if res is None:
+            await message.answer(text=messages.ERROR)
+            return
+        amount = res.get('amount')
+        await message.answer(text=f'Your amount of money is {amount}')
+
+
 @dp.callback_query_handler(lambda c: c.data in ['USD', 'RUB', 'KZT'], state=AccountStates)
 async def account_creating(callback_query: types.CallbackQuery, state: FSMContext):
     currency = callback_query.data

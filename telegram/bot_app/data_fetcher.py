@@ -18,10 +18,10 @@ EXPENSE_API = f"{HOST}{os.getenv('EXPENSE_API')}"
 
 
 class Account:
-    def __init__(self, telegram_user: User, password: str = PASSWORD):
+    def __init__(self, telegram_user: User, password: str = PASSWORD, token: str = None):
         self.telegram_user = telegram_user
         self.password = password
-        self.token = None
+        self.token = token
         self.currency = None
 
     async def login(self) -> bool:
@@ -46,6 +46,16 @@ class Account:
                     return True
                 await self._delete_user()
         return False
+
+    async def get(self) -> dict | None:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(
+                    ACCOUNT_API,
+                    headers={'Authorization': f'Token {self.token}'}) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    return data
+                return None
 
     async def _delete_user(self) -> bool:
         async with aiohttp.ClientSession() as session:
