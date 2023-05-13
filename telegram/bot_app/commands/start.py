@@ -12,7 +12,7 @@ from ..states import BaseStates, AccountStates
 
 @dp.message_handler(commands='start', state='*')
 async def start(message: types.Message, state: FSMContext):
-    await BaseStates.start.set()
+    await StartStates.start.set()
 
     account = Account(message.from_user)
     if await account.login():
@@ -30,7 +30,7 @@ async def start(message: types.Message, state: FSMContext):
 
 @dp.message_handler(commands='check', state='*')
 async def check(message: types.Message, state: FSMContext):
-    await BaseStates.start.set()
+    await StartStates.start.set()
     async with state.proxy() as data:
         token = data.get('token')
         if not token:
@@ -62,11 +62,4 @@ async def account_creating(callback_query: types.CallbackQuery, state: FSMContex
                                reply_markup=keyboard)
     else:
         await bot.send_message(chat_id=callback_query.from_user.id, text=messages.ERROR)
-    await BaseStates.start.set()
-
-
-@dp.callback_query_handler(state=AccountStates)
-async def process_invalid_currency_selection(callback_query: types.CallbackQuery):
-    message = f"Please select a valid currency"
-    keyboard = await keyboard_from_list(['USD', 'RUB', 'KZT', 'THB'])
-    await bot.send_message(chat_id=callback_query.from_user.id, text=message, reply_markup=keyboard)
+    await StartStates.start.set()

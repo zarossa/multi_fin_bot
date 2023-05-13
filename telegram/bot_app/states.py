@@ -2,6 +2,13 @@ from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
 class BaseStates(StatesGroup):
+    base = State()
+    create = State()
+    delete = State()
+    edit = State()
+
+
+class StartStates(StatesGroup):
     start = State()
 
 
@@ -9,31 +16,25 @@ class AccountStates(StatesGroup):
     create = State()
 
 
-class CategoryIncomeStates(StatesGroup):
-    base = State()
-    create = State()
-    delete = State()
-    edit = State()
+class BaseCategoryStates(BaseStates):
     edit_name = State()
 
 
-class IncomeStates(StatesGroup):
-    base = State()
-    create = State()
+class BaseTransaction(BaseStates):
     create_currency = State()
-    delete = State()
 
 
-class CategoryExpenseStates(StatesGroup):
-    base = State()
-    create = State()
-    delete = State()
-    edit = State()
-    edit_name = State()
+class CategoryIncomeStates(BaseCategoryStates):
+    pass
 
 
-class ExpenseStates(StatesGroup):
-    base = State()
-    create = State()
-    create_currency = State()
-    delete = State()
+class IncomeStates(BaseTransaction):
+    pass
+
+
+class CategoryExpenseStates(BaseCategoryStates):
+    pass
+
+
+class ExpenseStates(BaseTransaction):
+    pass

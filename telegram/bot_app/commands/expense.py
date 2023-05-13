@@ -5,12 +5,12 @@ from .. import messages
 from ..app import dp, bot
 from ..data_fetcher import Expense, ExpenseCategory
 from ..keyboards import keyboard_from_dict
-from ..states import BaseStates, ExpenseStates
+from ..states import StartStates, ExpenseStates
 
 
-@dp.callback_query_handler(lambda c: c.data == 'Expense', state=[BaseStates, ExpenseStates])
+@dp.callback_query_handler(lambda c: c.data == 'Expense', state=[StartStates, ExpenseStates])
 async def start(callback_query: types.CallbackQuery, state: FSMContext):
-    await BaseStates.start.set()
+    await StartStates.start.set()
     async with state.proxy() as data:
         token = data.get('token')
         if not token:
@@ -35,7 +35,7 @@ async def start(callback_query: types.CallbackQuery, state: FSMContext):
         await bot.send_message(chat_id=callback_query.from_user.id,
                                text=f'Choose a category:', reply_markup=keyboard)
     else:
-        await BaseStates.start.set()
+        await StartStates.start.set()
         await bot.send_message(chat_id=callback_query.from_user.id,
                                text=f'You don\'t have any expense category\nCreate new one here: /category_expense')
 
