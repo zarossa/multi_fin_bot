@@ -1,7 +1,7 @@
 from rest_framework import routers
 
-from bot.views import AccountViewSet, CurrencyViewSet, CategoryIncomeViewSet, IncomeViewSet, CategoryExpenseViewSet, \
-    ExpenseViewSet
+from bot.views import AccountViewSet, AccountCurrencyViewSet, CategoryIncomeViewSet, IncomeViewSet, \
+    CategoryExpenseViewSet, ExpenseViewSet
 
 
 class AccountRouter(routers.SimpleRouter):
@@ -24,7 +24,7 @@ account = AccountRouter()
 account.register(r'account', AccountViewSet, basename='account')
 
 currency = routers.SimpleRouter()
-currency.register(r'currency', CurrencyViewSet, basename='currency')
+currency.register(r'currency', AccountCurrencyViewSet, basename='currency')
 
 category_income = routers.SimpleRouter()
 category_income.register(r'category', CategoryIncomeViewSet, basename='category_income')

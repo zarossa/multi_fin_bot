@@ -1,9 +1,9 @@
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import status, mixins
-from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from .models import Account, Currency, AccountCurrency, CategoryIncome, Income, CategoryExpense, Expense
@@ -60,10 +60,9 @@ class AccountViewSet(mixins.CreateModelMixin,
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        currency_code = request.data.get('currency_code')
-        currency = get_object_or_404(Currency, code=currency_code)
+        currency = request.data.get('currency')
         data = {'user': request.user.pk,
-                'currency': currency.pk}
+                'currency': currency}
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -76,20 +75,16 @@ class AccountViewSet(mixins.CreateModelMixin,
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class CurrencyViewSet(AuthViewSet,
-                      mixins.ListModelMixin,
-                      mixins.CreateModelMixin,
-                      mixins.RetrieveModelMixin,
-                      mixins.UpdateModelMixin,
-                      mixins.DestroyModelMixin):
-    queryset = AccountCurrency.objects.all()
-    serializer_class = AccountCurrencySerializer
-
-    @action(methods=['get'], detail=False)
-    def all(self, request):
+class CurrencyAPI(APIView):
+    def get(self, request):
         currencies = Currency.objects.all()
         serializer = CurrencySerializer(currencies, many=True)
         return Response(serializer.data)
+
+
+class AccountCurrencyViewSet(BaseViewSet):
+    queryset = AccountCurrency.objects.all()
+    serializer_class = AccountCurrencySerializer
 
 
 class CategoryIncomeViewSet(BaseViewSet):
