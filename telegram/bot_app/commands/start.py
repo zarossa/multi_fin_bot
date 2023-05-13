@@ -5,9 +5,9 @@ from aiogram.dispatcher import FSMContext
 
 from .. import messages
 from ..app import dp, bot
-from ..data_fetcher import Account
-from ..keyboards import keyboard_from_list
-from ..states import BaseStates, AccountStates
+from ..data_fetcher import Account, Currency
+from ..keyboards import keyboard_from_list, keyboard_from_dict
+from ..states import StartStates, AccountStates
 
 
 @dp.message_handler(commands='start', state='*')
@@ -21,7 +21,9 @@ async def start(message: types.Message, state: FSMContext):
         keyboard = await keyboard_from_list(['Income', 'Expense'])
         await message.answer(text=messages.WELCOME_MESSAGE, reply_markup=keyboard)
     else:
-        keyboard = await keyboard_from_list(['USD', 'RUB', 'KZT', 'THB'])
+        currency = Currency()
+        currencies = await currency.get()
+        keyboard = await keyboard_from_dict(currencies)
         await message.answer(text=messages.CURRENCY, reply_markup=keyboard)
         await AccountStates.create.set()
         async with state.proxy() as data:
@@ -45,7 +47,7 @@ async def check(message: types.Message, state: FSMContext):
         await message.answer(text=f'Your amount of money is {amount}')
 
 
-@dp.callback_query_handler(lambda c: c.data in ['USD', 'RUB', 'KZT', 'THB'], state=AccountStates)
+@dp.callback_query_handler(state=AccountStates)
 async def account_creating(callback_query: types.CallbackQuery, state: FSMContext):
     currency = callback_query.data
     async with state.proxy() as data:

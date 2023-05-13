@@ -10,10 +10,12 @@ USER_API_REGISTER = f"{HOST}{os.getenv('USER_API_REGISTER')}"
 USER_API_LOGIN = f"{HOST}{os.getenv('USER_API_LOGIN')}"
 ACCOUNT_API = f"{HOST}{os.getenv('ACCOUNT_API')}"
 
-INCOME_API = f"{HOST}{os.getenv('INCOME_API')}"
-CATEGORY_INCOME_API = f"{INCOME_API}{os.getenv('CATEGORY')}"
+ACCOUNT_CURRENCY_API = f"{HOST}{os.getenv('CURRENCY_API')}"
+CURRENCY_API = f"{ACCOUNT_CURRENCY_API}{os.getenv('ALL')}"
 
+INCOME_API = f"{HOST}{os.getenv('INCOME_API')}"
 EXPENSE_API = f"{HOST}{os.getenv('EXPENSE_API')}"
+CATEGORY_INCOME_API = f"{INCOME_API}{os.getenv('CATEGORY')}"
 CATEGORY_EXPENSE_API = f"{EXPENSE_API}{os.getenv('CATEGORY')}"
 
 
@@ -82,7 +84,7 @@ class Account:
             async with session.post(
                     ACCOUNT_API,
                     headers={'Authorization': f'Token {self.token}'},
-                    json={'currency_code': currency}) as response:
+                    json={'currency': currency}) as response:
                 if response.status == 201:
                     self.currency = currency
                     return True
@@ -93,15 +95,16 @@ class APIClient:
     BASE_URL = ''
     HEADERS = {}
 
-    def __init__(self, token: str):
+    def __init__(self, token: str = None):
         self.token = token
         self.items = []
 
     async def get(self) -> list | None:
+        headers = {'Authorization': f'Token {self.token}', **self.HEADERS} if self.token else {}
         async with aiohttp.ClientSession() as session:
             async with session.get(
                     f'{self.BASE_URL}',
-                    headers={'Authorization': f'Token {self.token}', **self.HEADERS}) as response:
+                    headers=headers) as response:
                 if response.status == 200:
                     data = await response.json()
                     self.items = data
@@ -146,6 +149,17 @@ class BaseCategory(APIClient):
 class BaseTransaction(APIClient):
     async def create(self, amount: float, currency: int, category: int) -> bool:
         return await super().create(amount=float(amount), currency=currency, category=category)
+
+
+class Currency(APIClient):
+    BASE_URL = CURRENCY_API
+
+
+class AccountCurrency(APIClient):
+    BASE_URL = ACCOUNT_CURRENCY_API
+
+    async def create(self, currency: int) -> bool:
+        return await super().create(currency=currency)
 
 
 class IncomeCategory(BaseCategory):
