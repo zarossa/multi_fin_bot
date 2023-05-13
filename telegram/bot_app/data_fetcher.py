@@ -10,11 +10,11 @@ USER_API_REGISTER = f"{HOST}{os.getenv('USER_API_REGISTER')}"
 USER_API_LOGIN = f"{HOST}{os.getenv('USER_API_LOGIN')}"
 ACCOUNT_API = f"{HOST}{os.getenv('ACCOUNT_API')}"
 
-CATEGORY_INCOME_API = f"{HOST}{os.getenv('CATEGORY_INCOME_API')}"
 INCOME_API = f"{HOST}{os.getenv('INCOME_API')}"
+CATEGORY_INCOME_API = f"{INCOME_API}{os.getenv('CATEGORY')}"
 
-CATEGORY_EXPENSE_API = f"{HOST}{os.getenv('CATEGORY_EXPENSE_API')}"
 EXPENSE_API = f"{HOST}{os.getenv('EXPENSE_API')}"
+CATEGORY_EXPENSE_API = f"{EXPENSE_API}{os.getenv('CATEGORY')}"
 
 
 class Account:
@@ -89,28 +89,31 @@ class Account:
                 return False
 
 
-class IncomeCategory:
+class APIClient:
+    BASE_URL = ''
+    HEADERS = {}
+
     def __init__(self, token: str):
         self.token = token
-        self.categories = []
+        self.items = []
 
     async def get(self) -> list | None:
         async with aiohttp.ClientSession() as session:
             async with session.get(
-                    CATEGORY_INCOME_API,
-                    headers={'Authorization': f'Token {self.token}'}) as response:
+                    f'{self.BASE_URL}',
+                    headers={'Authorization': f'Token {self.token}', **self.HEADERS}) as response:
                 if response.status == 200:
                     data = await response.json()
-                    self.categories = data
+                    self.items = data
                     return data
                 return None
 
-    async def create(self, category_name: str) -> bool:
+    async def create(self, **kwargs) -> bool:
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                    CATEGORY_INCOME_API,
-                    headers={'Authorization': f'Token {self.token}'},
-                    json={'name': category_name}) as response:
+                    f'{self.BASE_URL}',
+                    headers={'Authorization': f'Token {self.token}', **self.HEADERS},
+                    json=kwargs) as response:
                 if response.status == 201:
                     return True
                 return False
@@ -118,8 +121,8 @@ class IncomeCategory:
     async def update(self, pk: int, name: str) -> bool:
         async with aiohttp.ClientSession() as session:
             async with session.put(
-                    f'{CATEGORY_INCOME_API}{pk}/',
-                    headers={'Authorization': f'Token {self.token}'},
+                    f'{self.BASE_URL}{pk}/',
+                    headers={'Authorization': f'Token {self.token}', **self.HEADERS},
                     json={'name': name}) as response:
                 if response.status == 200:
                     return True
@@ -128,126 +131,34 @@ class IncomeCategory:
     async def delete(self, pk: int) -> bool:
         async with aiohttp.ClientSession() as session:
             async with session.delete(
-                    f'{CATEGORY_INCOME_API}{pk}/',
-                    headers={'Authorization': f'Token {self.token}'}) as response:
+                    f'{self.BASE_URL}{pk}/',
+                    headers={'Authorization': f'Token {self.token}', **self.HEADERS}) as response:
                 if response.status == 204:
                     return True
                 return False
 
 
-class Income:
-    def __init__(self, token: str):
-        self.token = token
-        self.incomes = []
-
-    async def get(self) -> list | None:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                    INCOME_API,
-                    headers={'Authorization': f'Token {self.token}'}) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    self.incomes = data
-                    return data
-                return None
-
-    async def create(self, amount: float, currency: int, category: int) -> bool:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                    INCOME_API,
-                    headers={'Authorization': f'Token {self.token}'},
-                    json={'amount': float(amount), 'currency': currency, 'category': category}) as response:
-                if response.status == 201:
-                    return True
-                return False
-
-    async def delete(self, pk: int) -> bool:
-        async with aiohttp.ClientSession() as session:
-            async with session.delete(
-                    f'{INCOME_API}{pk}/',
-                    headers={'Authorization': f'Token {self.token}'}) as response:
-                if response.status == 204:
-                    return True
-                return False
-
-
-class ExpenseCategory:
-    def __init__(self, token: str):
-        self.token = token
-        self.categories = []
-
-    async def get(self) -> list | None:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                    CATEGORY_EXPENSE_API,
-                    headers={'Authorization': f'Token {self.token}'}) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    self.categories = data
-                    return data
-                return None
-
+class BaseCategory(APIClient):
     async def create(self, category_name: str) -> bool:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                    CATEGORY_EXPENSE_API,
-                    headers={'Authorization': f'Token {self.token}'},
-                    json={'name': category_name}) as response:
-                if response.status == 201:
-                    return True
-                return False
-
-    async def update(self, pk: int, name: str) -> bool:
-        async with aiohttp.ClientSession() as session:
-            async with session.put(
-                    f'{CATEGORY_EXPENSE_API}{pk}/',
-                    headers={'Authorization': f'Token {self.token}'},
-                    json={'name': name}) as response:
-                if response.status == 200:
-                    return True
-                return False
-
-    async def delete(self, pk: int) -> bool:
-        async with aiohttp.ClientSession() as session:
-            async with session.delete(
-                    f'{CATEGORY_EXPENSE_API}{pk}/',
-                    headers={'Authorization': f'Token {self.token}'}) as response:
-                if response.status == 204:
-                    return True
-                return False
+        return await super().create(name=category_name)
 
 
-class Expense:
-    def __init__(self, token: str):
-        self.token = token
-        self.incomes = []
-
-    async def get(self) -> list | None:
-        async with aiohttp.ClientSession() as session:
-            async with session.get(
-                    EXPENSE_API,
-                    headers={'Authorization': f'Token {self.token}'}) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    self.incomes = data
-                    return data
-                return None
-
+class BaseTransaction(APIClient):
     async def create(self, amount: float, currency: int, category: int) -> bool:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                    EXPENSE_API,
-                    headers={'Authorization': f'Token {self.token}'},
-                    json={'amount': float(amount), 'currency': currency, 'category': category}) as response:
-                if response.status == 201:
-                    return True
-                return False
+        return await super().create(amount=float(amount), currency=currency, category=category)
 
-    async def delete(self, pk: int) -> bool:
-        async with aiohttp.ClientSession() as session:
-            async with session.delete(
-                    f'{EXPENSE_API}{pk}/',
-                    headers={'Authorization': f'Token {self.token}'}) as response:
-                if response.status == 204:
-                    return True
-                return False
+
+class IncomeCategory(BaseCategory):
+    BASE_URL = CATEGORY_INCOME_API
+
+
+class Income(BaseTransaction):
+    BASE_URL = INCOME_API
+
+
+class ExpenseCategory(BaseCategory):
+    BASE_URL = CATEGORY_EXPENSE_API
+
+
+class Expense(BaseTransaction):
+    BASE_URL = EXPENSE_API
