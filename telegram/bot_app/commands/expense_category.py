@@ -8,7 +8,7 @@ from ..keyboards import base_keyboard, keyboard_from_dict
 from ..states import StartStates, CategoryExpenseStates
 
 
-@dp.message_handler(commands='category_expense', state=[StartStates, CategoryExpenseStates])
+@dp.message_handler(commands='category_expense', state='*')
 async def start(message: types.Message, state: FSMContext):
     await StartStates.start.set()
     async with state.proxy() as data:
