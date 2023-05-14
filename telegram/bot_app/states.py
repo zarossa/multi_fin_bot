@@ -9,6 +9,12 @@ class AccountStates(StatesGroup):
     create = State()
 
 
+class CurrencyStates(StatesGroup):
+    base = State()
+    add = State()
+    delete = State()
+
+
 class CategoryIncomeStates(StatesGroup):
     base = State()
     create = State()
