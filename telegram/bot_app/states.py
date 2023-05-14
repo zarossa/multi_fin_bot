@@ -1,12 +1,18 @@
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
-class BaseStates(StatesGroup):
+class StartStates(StatesGroup):
     start = State()
 
 
 class AccountStates(StatesGroup):
     create = State()
+
+
+class CurrencyStates(StatesGroup):
+    base = State()
+    add = State()
+    delete = State()
 
 
 class CategoryIncomeStates(StatesGroup):

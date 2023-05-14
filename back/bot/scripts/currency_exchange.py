@@ -1,11 +1,8 @@
 import decimal
 
 
-def convert(amount, user_currency: int, amount_currency: int) -> decimal.Decimal:
-    exchange_rates = {
-        1: 1,
-        2: 76,
-        3: 440,
-    }
-    rate = exchange_rates.get(user_currency) / exchange_rates.get(amount_currency)
-    return decimal.Decimal(float(amount) * rate)
+def convert(amount: decimal.Decimal,
+            user_currency_rate: decimal.Decimal,
+            amount_currency_rate: decimal.Decimal) -> decimal.Decimal:
+    rate = user_currency_rate / amount_currency_rate
+    return amount * rate

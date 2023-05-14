@@ -5,14 +5,25 @@ from aiogram.dispatcher import FSMContext
 
 from .. import messages
 from ..app import dp, bot
-from ..data_fetcher import Account
-from ..keyboards import keyboard_from_list
-from ..states import BaseStates, AccountStates
+from ..data_fetcher import Account, Currency
+from ..keyboards import keyboard_from_list, keyboard_from_dict
+from ..states import StartStates, AccountStates
+
+USERS = list(map(int, os.getenv('USERS').split(',')))
+
+
+def auth(func):
+    async def wrapper(message: types.Message, state: FSMContext):
+        if message.from_user.id not in USERS:
+            return await message.answer(text=f'{messages.DENIED}\nYour id is {message.from_user.id}')
+        return await func(message, state)
+    return wrapper
 
 
 @dp.message_handler(commands='start', state='*')
+@auth
 async def start(message: types.Message, state: FSMContext):
-    await BaseStates.start.set()
+    await StartStates.start.set()
 
     account = Account(message.from_user)
     if await account.login():
@@ -21,7 +32,9 @@ async def start(message: types.Message, state: FSMContext):
         keyboard = await keyboard_from_list(['Income', 'Expense'])
         await message.answer(text=messages.WELCOME_MESSAGE, reply_markup=keyboard)
     else:
-        keyboard = await keyboard_from_list(['USD', 'RUB', 'KZT'])
+        currency = Currency()
+        currencies = await currency.get()
+        keyboard = await keyboard_from_dict(currencies)
         await message.answer(text=messages.CURRENCY, reply_markup=keyboard)
         await AccountStates.create.set()
         async with state.proxy() as data:
@@ -30,7 +43,7 @@ async def start(message: types.Message, state: FSMContext):
 
 @dp.message_handler(commands='check', state='*')
 async def check(message: types.Message, state: FSMContext):
-    await BaseStates.start.set()
+    await StartStates.start.set()
     async with state.proxy() as data:
         token = data.get('token')
         if not token:
@@ -45,7 +58,7 @@ async def check(message: types.Message, state: FSMContext):
         await message.answer(text=f'Your amount of money is {amount}')
 
 
-@dp.callback_query_handler(lambda c: c.data in ['USD', 'RUB', 'KZT'], state=AccountStates)
+@dp.callback_query_handler(state=AccountStates)
 async def account_creating(callback_query: types.CallbackQuery, state: FSMContext):
     currency = callback_query.data
     async with state.proxy() as data:
@@ -62,11 +75,4 @@ async def account_creating(callback_query: types.CallbackQuery, state: FSMContex
                                reply_markup=keyboard)
     else:
         await bot.send_message(chat_id=callback_query.from_user.id, text=messages.ERROR)
-    await BaseStates.start.set()
-
-
-@dp.callback_query_handler(state=AccountStates)
-async def process_invalid_currency_selection(callback_query: types.CallbackQuery):
-    message = f"Please select a valid currency"
-    keyboard = await keyboard_from_list(['USD', 'RUB', 'KZT'])
-    await bot.send_message(chat_id=callback_query.from_user.id, text=message, reply_markup=keyboard)
+    await StartStates.start.set()

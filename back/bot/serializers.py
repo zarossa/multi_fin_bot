@@ -1,7 +1,7 @@
 from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 
-from .models import Currency, Account, CategoryIncome, Income, CategoryExpense, Expense
+from .models import Currency, Account, CategoryIncome, Income, CategoryExpense, Expense, AccountCurrency
 from .scripts.currency_exchange import convert
 
 
@@ -24,7 +24,25 @@ class CurrencySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Currency
-        fields = ('pk', 'code', 'name')
+        fields = ('pk', 'code', 'name', 'rate')
+
+
+class AccountCurrencySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = AccountCurrency
+        fields = ('pk', 'currency')
+
+
+class AccountCurrencyFullSerializer(serializers.ModelSerializer):
+    currency_pk = serializers.IntegerField(source='currency.pk')
+    code = serializers.CharField(source='currency.code')
+    name = serializers.CharField(source='currency.name')
+    rate = serializers.DecimalField(source='currency.rate', max_digits=20, decimal_places=10)
+
+    class Meta:
+        model = AccountCurrency
+        fields = ('pk', 'currency_pk', 'code', 'name', 'rate')
 
 
 class CategoryIncomeSerializer(serializers.ModelSerializer):
@@ -48,8 +66,8 @@ class IncomeSerializer(serializers.ModelSerializer):
         read_only_fields = ('converted_amount',)
 
     def validate(self, data):
-        amount_currency = data.get('currency').pk
-        user_currency = self.context['request'].user.account.currency_id
+        amount_currency = data.get('currency').rate
+        user_currency = self.context['request'].user.account.currency.rate
         data['converted_amount'] = convert(data.get('amount'), user_currency, amount_currency)
         return data
 
@@ -75,7 +93,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
         read_only_fields = ('converted_amount',)
 
     def validate(self, data):
-        amount_currency = data.get('currency').pk
-        user_currency = self.context['request'].user.account.currency_id
+        amount_currency = data.get('currency').rate
+        user_currency = self.context['request'].user.account.currency.rate
         data['converted_amount'] = convert(data.get('amount'), user_currency, amount_currency)
         return data

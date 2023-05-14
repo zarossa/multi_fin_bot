@@ -1,11 +1,16 @@
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup, InlineKeyboardButton, InlineKeyboardMarkup
 
 
-async def base_keyboard(is_blank: bool = False) -> InlineKeyboardMarkup:
+async def base_keyboard(is_adding: bool = False, is_blank: bool = False) -> InlineKeyboardMarkup:
     keyboard = InlineKeyboardMarkup()
-    buttons = ['Create new']
-    if not is_blank:
-        buttons.extend(['Delete', 'Edit'])
+    if is_adding:
+        buttons = ['Add']
+        if not is_blank:
+            buttons.extend(['Delete'])
+    else:
+        buttons = ['Create new']
+        if not is_blank:
+            buttons.extend(['Delete', 'Edit'])
     [keyboard.add(InlineKeyboardButton(button, callback_data=button)) for button in buttons]
     return keyboard
 

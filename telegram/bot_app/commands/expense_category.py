@@ -5,12 +5,12 @@ from .. import messages
 from ..app import dp, bot
 from ..data_fetcher import ExpenseCategory
 from ..keyboards import base_keyboard, keyboard_from_dict
-from ..states import BaseStates, CategoryExpenseStates
+from ..states import StartStates, CategoryExpenseStates
 
 
-@dp.message_handler(commands='category_expense', state=[BaseStates, CategoryExpenseStates])
+@dp.message_handler(commands='category_expense', state='*')
 async def start(message: types.Message, state: FSMContext):
-    await BaseStates.start.set()
+    await StartStates.start.set()
     async with state.proxy() as data:
         token = data.get('token')
         if not token:
@@ -40,7 +40,7 @@ async def create_category_expense(callback_query: types.CallbackQuery, state: FS
         category = data.get('data')
         if not category.token:
             await bot.send_message(chat_id=callback_query.from_user.id, text=messages.ERROR)
-            await BaseStates.start.set()
+            await StartStates.start.set()
             return
         await bot.send_message(callback_query.from_user.id, "Please provide the name of a new expense category")
         await CategoryExpenseStates.create.set()
@@ -71,7 +71,7 @@ async def edit_category_expense(callback_query: types.CallbackQuery, state: FSMC
         category = data.get('data')
         if not category.token:
             await bot.send_message(chat_id=callback_query.from_user.id, text=messages.ERROR)
-            await BaseStates.start.set()
+            await StartStates.start.set()
             return
         await category.get()
         await bot.send_message(chat_id=callback_query.from_user.id,
@@ -87,7 +87,7 @@ async def edit_category_expense_process(callback_query: types.CallbackQuery, sta
         category = data.get('data')
         if not category.token:
             await bot.send_message(chat_id=callback_query.from_user.id, text=messages.ERROR)
-            await BaseStates.start.set()
+            await StartStates.start.set()
             return
 
         await bot.send_message(callback_query.from_user.id, "Please provide the name of the expense category")
@@ -121,7 +121,7 @@ async def delete_category_expense(callback_query: types.CallbackQuery, state: FS
         category = data.get('data')
         if not category.token:
             await bot.send_message(chat_id=callback_query.from_user.id, text=messages.ERROR)
-            await BaseStates.start.set()
+            await StartStates.start.set()
             return
         await category.get()
         await bot.send_message(chat_id=callback_query.from_user.id,

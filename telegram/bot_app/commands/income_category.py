@@ -5,12 +5,12 @@ from .. import messages
 from ..app import dp, bot
 from ..data_fetcher import IncomeCategory
 from ..keyboards import base_keyboard, keyboard_from_dict
-from ..states import BaseStates, CategoryIncomeStates
+from ..states import StartStates, CategoryIncomeStates
 
 
-@dp.message_handler(commands='category_income', state=[BaseStates, CategoryIncomeStates])
+@dp.message_handler(commands='category_income', state='*')
 async def start(message: types.Message, state: FSMContext):
-    await BaseStates.start.set()
+    await StartStates.start.set()
     async with state.proxy() as data:
         token = data.get('token')
         if not token:
@@ -40,7 +40,7 @@ async def create_category_income(callback_query: types.CallbackQuery, state: FSM
         category = data.get('data')
         if not category.token:
             await bot.send_message(chat_id=callback_query.from_user.id, text=messages.ERROR)
-            await BaseStates.start.set()
+            await StartStates.start.set()
             return
         await bot.send_message(callback_query.from_user.id, "Please provide the name of a new income category")
         await CategoryIncomeStates.create.set()
@@ -71,7 +71,7 @@ async def edit_category_income(callback_query: types.CallbackQuery, state: FSMCo
         category = data.get('data')
         if not category.token:
             await bot.send_message(chat_id=callback_query.from_user.id, text=messages.ERROR)
-            await BaseStates.start.set()
+            await StartStates.start.set()
             return
         await category.get()
         await bot.send_message(chat_id=callback_query.from_user.id,
@@ -87,7 +87,7 @@ async def edit_category_income_process(callback_query: types.CallbackQuery, stat
         category = data.get('data')
         if not category.token:
             await bot.send_message(chat_id=callback_query.from_user.id, text=messages.ERROR)
-            await BaseStates.start.set()
+            await StartStates.start.set()
             return
 
         await bot.send_message(callback_query.from_user.id, "Please provide the name of the income category")
@@ -121,7 +121,7 @@ async def delete_category_income(callback_query: types.CallbackQuery, state: FSM
         category = data.get('data')
         if not category.token:
             await bot.send_message(chat_id=callback_query.from_user.id, text=messages.ERROR)
-            await BaseStates.start.set()
+            await StartStates.start.set()
             return
         await category.get()
         await bot.send_message(chat_id=callback_query.from_user.id,
