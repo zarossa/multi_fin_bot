@@ -8,7 +8,7 @@ from rest_framework.viewsets import GenericViewSet
 
 from .models import Account, Currency, AccountCurrency, CategoryIncome, Income, CategoryExpense, Expense
 from .serializers import AccountSerializer, AccountCurrencySerializer, CategoryIncomeSerializer, IncomeSerializer, \
-    CategoryExpenseSerializer, ExpenseSerializer, CurrencySerializer
+    CategoryExpenseSerializer, ExpenseSerializer, CurrencySerializer, AccountCurrencyFullSerializer
 
 
 class AuthViewSet(GenericViewSet):
@@ -85,6 +85,11 @@ class CurrencyAPI(APIView):
 class AccountCurrencyViewSet(BaseViewSet):
     queryset = AccountCurrency.objects.all()
     serializer_class = AccountCurrencySerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = AccountCurrencyFullSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class CategoryIncomeViewSet(BaseViewSet):

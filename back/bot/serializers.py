@@ -34,6 +34,10 @@ class AccountCurrencySerializer(serializers.ModelSerializer):
         fields = ('pk', 'currency')
 
 
+class AccountCurrencyFullSerializer(AccountCurrencySerializer):
+    currency = CurrencySerializer()
+
+
 class CategoryIncomeSerializer(serializers.ModelSerializer):
 
     class Meta:
