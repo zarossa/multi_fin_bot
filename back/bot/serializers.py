@@ -55,8 +55,8 @@ class IncomeSerializer(serializers.ModelSerializer):
         read_only_fields = ('converted_amount',)
 
     def validate(self, data):
-        amount_currency = data.get('currency').pk
-        user_currency = self.context['request'].user.account.currency_id
+        amount_currency = data.get('currency').rate
+        user_currency = self.context['request'].user.account.currency.rate
         data['converted_amount'] = convert(data.get('amount'), user_currency, amount_currency)
         return data
 
@@ -82,7 +82,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
         read_only_fields = ('converted_amount',)
 
     def validate(self, data):
-        amount_currency = data.get('currency').pk
-        user_currency = self.context['request'].user.account.currency_id
+        amount_currency = data.get('currency').rate
+        user_currency = self.context['request'].user.account.currency.rate
         data['converted_amount'] = convert(data.get('amount'), user_currency, amount_currency)
         return data
