@@ -34,8 +34,15 @@ class AccountCurrencySerializer(serializers.ModelSerializer):
         fields = ('pk', 'currency')
 
 
-class AccountCurrencyFullSerializer(AccountCurrencySerializer):
-    currency = CurrencySerializer()
+class AccountCurrencyFullSerializer(serializers.ModelSerializer):
+    currency_pk = serializers.IntegerField(source='currency.pk')
+    code = serializers.CharField(source='currency.code')
+    name = serializers.CharField(source='currency.name')
+    rate = serializers.DecimalField(source='currency.rate', max_digits=20, decimal_places=10)
+
+    class Meta:
+        model = AccountCurrency
+        fields = ('pk', 'currency_pk', 'code', 'name', 'rate')
 
 
 class CategoryIncomeSerializer(serializers.ModelSerializer):
