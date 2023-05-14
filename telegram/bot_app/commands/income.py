@@ -50,7 +50,7 @@ async def create_income(callback_query: types.CallbackQuery, state: FSMContext):
         currency = AccountCurrency(token=token)
         currencies = await currency.get()
         if currencies:
-            keyboard = await keyboard_from_dict([cur.get('currency') for cur in currencies])
+            keyboard = await keyboard_from_dict(currencies, callback_key='currency_pk')
             await bot.send_message(callback_query.from_user.id, "Choose amount currency:", reply_markup=keyboard)
         else:
             await StartStates.start.set()
