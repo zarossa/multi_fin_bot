@@ -10,6 +10,7 @@ To get started, please type:
 '''
 
 REGISTER = 'It looks like you have registered. Congratulations!'
+DENIED = 'Access denied.\nThis bot is in alpha testing. If you want to join, forward @zarossa this message.'
 
 ERROR = 'Something goes wrong. Write to @zarossa'
 SUCCESS = 'Success'

@@ -9,8 +9,19 @@ from ..data_fetcher import Account, Currency
 from ..keyboards import keyboard_from_list, keyboard_from_dict
 from ..states import StartStates, AccountStates
 
+USERS = list(map(int, os.getenv('USERS').split(',')))
+
+
+def auth(func):
+    async def wrapper(message: types.Message, state: FSMContext):
+        if message.from_user.id not in USERS:
+            return await message.answer(text=f'{messages.DENIED}\nYour id is {message.from_user.id}')
+        return await func(message, state)
+    return wrapper
+
 
 @dp.message_handler(commands='start', state='*')
+@auth
 async def start(message: types.Message, state: FSMContext):
     await StartStates.start.set()
 
