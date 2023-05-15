@@ -5,7 +5,9 @@ from aiogram.types import User
 
 PASSWORD = os.getenv('PASSWORD')
 
-HOST = os.getenv('HOST')
+PORT = os.getenv('PORT')
+PORT = f':{PORT}' if PORT else ''
+HOST = f"http://{os.getenv('HOST')}{PORT}/"
 USER_API_REGISTER = f"{HOST}{os.getenv('USER_API_REGISTER')}"
 USER_API_LOGIN = f"{HOST}{os.getenv('USER_API_LOGIN')}"
 ACCOUNT_API = f"{HOST}{os.getenv('ACCOUNT_API')}"
