@@ -76,7 +76,7 @@ async def edit_category_expense(callback_query: types.CallbackQuery, state: FSMC
         await category.get()
         await bot.send_message(chat_id=callback_query.from_user.id,
                                text="Please choose an expense category to edit",
-                               reply_markup=await keyboard_from_dict(category.categories))
+                               reply_markup=await keyboard_from_dict(category.items))
         await CategoryExpenseStates.edit.set()
         data['token'] = category.token
 
@@ -126,7 +126,7 @@ async def delete_category_expense(callback_query: types.CallbackQuery, state: FS
         await category.get()
         await bot.send_message(chat_id=callback_query.from_user.id,
                                text="Please choose an expense category to delete",
-                               reply_markup=await keyboard_from_dict(category.categories))
+                               reply_markup=await keyboard_from_dict(category.items))
         await CategoryExpenseStates.delete.set()
         data['data'] = category
 

@@ -76,7 +76,7 @@ async def edit_category_income(callback_query: types.CallbackQuery, state: FSMCo
         await category.get()
         await bot.send_message(chat_id=callback_query.from_user.id,
                                text="Please choose an income category to edit",
-                               reply_markup=await keyboard_from_dict(category.categories))
+                               reply_markup=await keyboard_from_dict(category.itesm))
         await CategoryIncomeStates.edit.set()
         data['token'] = category.token
 
@@ -126,7 +126,7 @@ async def delete_category_income(callback_query: types.CallbackQuery, state: FSM
         await category.get()
         await bot.send_message(chat_id=callback_query.from_user.id,
                                text="Please choose an income category to delete",
-                               reply_markup=await keyboard_from_dict(category.categories))
+                               reply_markup=await keyboard_from_dict(category.items))
         await CategoryIncomeStates.delete.set()
         data['data'] = category
 
