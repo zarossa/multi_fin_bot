@@ -1,0 +1,11 @@
+version: '3.11'
+
+services:
+  telegram:
+    image: telegram:latest
+    container_name: telegram
+    volumes:
+      - .:/app
+    restart: always
+    build: .
+    command: python main.py
