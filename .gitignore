@@ -6,6 +6,6 @@ venv
 #Environments
 .env
 xenv
-.db
+back/celerybeat-schedule.db
 
 temp.py

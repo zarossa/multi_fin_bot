@@ -1,0 +1,80 @@
+version: '3'
+services:
+  db:
+    container_name: pg_db
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER:
+      POSTGRES_PASSWORD:
+      POSTGRES_DB: fin_bot
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+
+  pgadmin:
+    container_name: pgdmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL:
+      PGADMIN_DEFAULT_PASSWORD:
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+
+  back:
+    image: back:latest
+    container_name: back
+    restart: always
+    build:
+      context: ./multi_fin_bot/back/
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:80
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+      - redis
+
+  telegram:
+    image: telegram:latest
+    container_name: telegram
+    restart: always
+    build:
+      context: ./multi_fin_bot/telegram/
+      dockerfile: Dockerfile
+    command: python main.py
+    depends_on:
+      - back
+
+  celery-worker:
+    image: celery:worker
+    container_name: celery-worker
+    restart: always
+    build:
+      context: ./multi_fin_bot/back/
+      dockerfile: Dockerfile
+    command: celery -A proj worker -l INFO
+    depends_on:
+      - back
+      - redis
+
+  celery-beat:
+    image: celery:beat
+    container_name: celery-beat
+    restart: always
+    build:
+      context: ./multi_fin_bot/back/
+      dockerfile: Dockerfile
+    command: celery -A proj beat -l info
+    depends_on:
+      - back
+      - redis
+
+  redis:
+    image: redis:5-alpine
+    container_name: redis
+    restart: always
