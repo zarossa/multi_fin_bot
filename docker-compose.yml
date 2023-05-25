@@ -4,10 +4,8 @@ services:
     container_name: pg_db
     image: postgres
     restart: always
-    environment:
-      POSTGRES_USER:
-      POSTGRES_PASSWORD:
-      POSTGRES_DB: fin_bot
+    env_file:
+      - ./db.env
     ports:
       - "5432:5432"
     volumes:
@@ -17,9 +15,8 @@ services:
     container_name: pgdmin
     image: dpage/pgadmin4
     restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL:
-      PGADMIN_DEFAULT_PASSWORD:
+    env_file:
+      - ./pgadmin.env
     ports:
       - "8080:80"
     depends_on:
@@ -32,12 +29,20 @@ services:
     build:
       context: ./multi_fin_bot/back/
       dockerfile: Dockerfile
-    command: python manage.py runserver 0.0.0.0:80
     ports:
-      - "80:80"
+      - "8000:8000"
     depends_on:
       - db
       - redis
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    volumes:
+      - ./multi_fin_bot/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - back
 
   telegram:
     image: telegram:latest
