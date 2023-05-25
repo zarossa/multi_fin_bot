@@ -6,8 +6,8 @@ services:
     restart: always
     env_file:
       - ./db.env
-    ports:
-      - "5432:5432"
+    expose:
+      - 5432
     volumes:
       - ./postgres_data:/var/lib/postgresql/data
 
@@ -18,7 +18,7 @@ services:
     env_file:
       - ./pgadmin.env
     ports:
-      - "8080:80"
+      - 8080:80
     depends_on:
       - db
 
@@ -26,20 +26,25 @@ services:
     image: back:latest
     container_name: back
     restart: always
+    volumes:
+      - static_data:/app/static
     build:
       context: ./multi_fin_bot/back/
       dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
+    expose:
+      - 8000
     depends_on:
       - db
       - redis
 
   nginx:
     image: nginx:latest
+    container_name: nginx
+    restart: always
     ports:
       - 80:80
     volumes:
+      - static_data:/var/www/html/static
       - ./multi_fin_bot/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - back
@@ -83,3 +88,6 @@ services:
     image: redis:5-alpine
     container_name: redis
     restart: always
+
+volumes:
+  static_data:
