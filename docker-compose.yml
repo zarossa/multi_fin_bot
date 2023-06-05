@@ -60,30 +60,6 @@ services:
     depends_on:
       - back
 
-  celery-worker:
-    image: celery:worker
-    container_name: celery-worker
-    restart: always
-    build:
-      context: ./multi_fin_bot/back/
-      dockerfile: Dockerfile
-    command: celery -A proj worker -l INFO
-    depends_on:
-      - back
-      - redis
-
-  celery-beat:
-    image: celery:beat
-    container_name: celery-beat
-    restart: always
-    build:
-      context: ./multi_fin_bot/back/
-      dockerfile: Dockerfile
-    command: celery -A proj beat -l info
-    depends_on:
-      - back
-      - redis
-
   redis:
     image: redis:5-alpine
     container_name: redis
